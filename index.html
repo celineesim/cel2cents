@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Celine's Cents · Money Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root, [data-theme="sage"]{
+  --bg:#F6F1EA; --card:#FFFFFF; --ink:#1E2B26; --muted:#66706B; --line:#E6DDCF; --soft:#F3ECE2;
+  --brand:#1F4D3F; --brand-ink:#FFFFFF; --accent:#D9703F; --accent-soft:#FBE7DC;
+  --good:#2F7D57; --good-soft:#E3F2E9; --warn:#B4651B; --warn-soft:#FDF0DF; --bad:#B03A3A; --bad-soft:#FBE6E6;
+  --c1:#9AA39E; --c2:#B03A3A; --c3:#D9703F; --c4:#1F4D3F; --c5:#CFC6B6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--brand)}
+button{font:inherit;color:inherit;cursor:pointer}
+input{font:inherit;color:inherit}
+.serif{font-family:"Fraunces",Georgia,serif}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+.topbar{background:var(--brand);color:var(--brand-ink)}
+.topbar .wrap{display:flex;align-items:center;gap:12px;height:60px}
+.mark{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:"Fraunces",serif;font-weight:700;font-size:15px;flex:none}
+.topbar .name{font-weight:700;letter-spacing:.01em}
+.topbar .tag{opacity:.75;font-size:14px}
+.topbar nav{margin-left:auto;display:flex;gap:4px}
+@media (max-width:640px){.topbar .name{display:none}.topbar .wrap{gap:8px;padding:0 12px}.topbar nav{gap:0}.topbar nav a{padding:6px 8px;font-size:12.5px}}
+.topbar nav a{color:var(--brand-ink);text-decoration:none;font-size:14px;font-weight:600;padding:7px 12px;border-radius:99px;opacity:.8}
+.topbar nav a.on{background:rgba(255,255,255,.18);opacity:1}
+@media (max-width:640px){.topbar .tag{display:none}.topbar nav a{padding:6px 9px;font-size:13px}}
+
+.hero{padding:44px 0 8px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:"Fraunces",serif;font-weight:700;font-size:clamp(34px,6vw,54px);line-height:1.05;margin:10px 0 14px;letter-spacing:-.01em}
+h1 em{font-style:italic;font-weight:500;color:var(--accent)}
+.lede{font-size:18px;color:var(--muted);max-width:620px;margin:0}
+.looks{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:22px 0 6px}
+.looks span{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.looks button{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:6px 14px 6px 8px;font-size:14px;display:flex;align-items:center;gap:8px}
+.looks button i{width:16px;height:16px;border-radius:50%;display:block}
+.looks button.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:28px;margin:22px 0}
+@media (max-width:640px){.card{padding:20px;border-radius:18px}}
+.step{display:flex;align-items:center;gap:12px;margin:0 0 6px}
+.step b{width:34px;height:34px;border-radius:50%;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-size:15px;flex:none}
+.step h2{margin:0;font-size:24px;font-weight:800;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:4px 0 18px}
+
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media (max-width:640px){.g3,.g2{grid-template-columns:1fr 1fr}}
+.f{display:block;font-size:14px;font-weight:600}
+.f small{font-weight:400;color:var(--muted)}
+.inp{display:flex;align-items:center;background:var(--soft);border:1.5px solid var(--line);border-radius:12px;padding:0 12px;margin-top:6px;height:48px}
+.inp:focus-within{border-color:var(--brand)}
+.inp span{color:var(--muted);margin-right:6px}
+.inp input{border:0;background:transparent;outline:0;width:100%;font-size:18px;font-weight:700}
+.full{grid-column:1/-1}
+.linkbtn{border:0;background:none;padding:6px 0 0;color:var(--accent);font-weight:700;font-size:13px;text-decoration:underline}
+.oa-est{margin-top:16px;border:1.5px dashed var(--accent);border-radius:16px;padding:16px;display:grid;grid-template-columns:1.6fr 1fr;gap:12px 18px;align-items:end}
+.oa-est>div:first-child{grid-column:1/-1}
+.oa-est small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.oa-res{font-size:15px}.oa-res b{font-size:22px;color:var(--brand);display:block}
+.oa-est .btn{justify-self:start;padding:10px 18px;font-size:14px}
+@media (max-width:640px){.oa-est{grid-template-columns:1fr}}
+.oa-est[hidden]{display:none}
+.chips{display:flex;gap:6px;flex-wrap:wrap;width:100%;padding-left:38px}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:4px 12px;font-size:13px;font-weight:600}
+.chip.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.oa-line{width:100%;padding-left:38px;font-size:13px;color:var(--muted)}
+.oa-line b{color:var(--good)}
+.callout{margin-top:16px;padding:14px 16px;border-radius:14px;background:var(--soft);border-left:4px solid var(--brand);font-size:15px}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+
+.cats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.starter{display:flex;gap:16px;align-items:center;background:var(--soft);border-radius:16px;padding:16px 18px;margin-bottom:16px;font-size:15px}
+.starter .btn{flex:none;padding:11px 18px;font-size:14px}
+@media (max-width:640px){.starter{flex-direction:column;align-items:flex-start}}
+@media (max-width:640px){.cats{grid-template-columns:repeat(3,1fr)}}
+.cat{position:relative;border:1.5px solid var(--line);background:var(--soft);border-radius:14px;padding:14px 6px 10px;text-align:center;font-size:14px;font-weight:600}
+.cat .em{font-size:26px;display:block;line-height:1.2;margin-bottom:4px}
+.cat.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.cat .n{position:absolute;top:-7px;right:-7px;background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;font-size:12px;display:grid;place-items:center}
+.catblurb{margin:18px 0 12px;color:var(--muted);font-style:italic}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:640px){.tiers{grid-template-columns:1fr}}
+.tier{border:1.5px solid var(--line);border-radius:16px;padding:16px;background:var(--card);text-align:left;position:relative}
+.tier.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.tier .lv{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.tier h4{margin:6px 0 2px;font-size:17px}
+.tier .note{font-size:13px;color:var(--muted);min-height:36px}
+.tier .price{font-family:"Fraunces",serif;font-weight:700;font-size:26px;color:var(--brand);margin-top:6px}
+.tier .chk{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:13px}
+.tier.on .chk{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.mygoals{margin-top:22px;border:1.5px solid var(--accent);background:linear-gradient(180deg,var(--accent-soft),transparent 140%);border-radius:18px;padding:16px}
+.mygoals h3{margin:0 0 10px;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+.grow{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:14px;padding:12px 14px;margin-top:8px;flex-wrap:wrap}
+.grow .em{font-size:26px}
+.grow .t{flex:1;min-width:140px}
+.grow .t b{display:block}
+.grow .t small{color:var(--muted)}
+.mini{display:flex;align-items:center;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:0 8px;height:36px;width:130px}
+.mini span{color:var(--muted);font-size:13px;margin-right:4px;white-space:nowrap}
+.mini input{border:0;background:transparent;outline:0;width:100%;font-weight:700}
+.yrs{display:flex;align-items:center;gap:8px}
+.yrs button{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);font-size:18px;line-height:1}
+.yrs .v{text-align:center;min-width:58px;font-size:14px;line-height:1.2}
+.yrs .v b{display:block;font-size:15px}
+.x{border:0;background:transparent;font-size:18px;color:var(--muted);padding:4px 6px}
+.empty{color:var(--muted);font-size:15px;padding:6px 2px}
+
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:transparent;padding:8px 16px;text-align:center;line-height:1.15}
+.seg button b{display:block;font-size:18px}
+.seg button small{font-size:12px;color:var(--muted)}
+.seg button.on{background:var(--brand);color:var(--brand-ink)}
+.seg button.on small{color:inherit;opacity:.85}
+.prepared{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin:6px 0 4px}
+.headline{font-size:clamp(24px,4vw,34px);font-weight:800;line-height:1.15;margin:0 0 18px;letter-spacing:-.01em}
+.headline .amt{color:var(--accent)}
+.ratebar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;color:var(--muted)}
+
+table.plan{width:100%;border-collapse:collapse;font-size:15px}
+table.plan th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:right;padding:8px 6px;border-bottom:1.5px solid var(--line);font-weight:700}
+table.plan th:first-child,table.plan td:first-child{text-align:left}
+table.plan td{padding:12px 6px;border-bottom:1px solid var(--line);text-align:right;vertical-align:middle}
+table.plan td small{display:block;color:var(--muted);font-size:12px}
+table.plan tr.band td{background:var(--soft);text-align:left;font-weight:700;padding:10px 10px}
+table.plan tr.band td small{display:inline;font-weight:400;margin-left:6px}
+table.plan td.m{font-weight:800;font-size:17px}
+table.plan tr.tot td{border-bottom:0;font-weight:800;font-size:18px;padding-top:16px}
+table.plan tr.tot td.m{font-size:22px;color:var(--brand)}
+.gname{display:flex;gap:10px;align-items:center}
+.gname .em{font-size:22px}
+.covered{color:var(--good);font-weight:700;font-size:13px}
+@media (max-width:640px){table.plan .hide-s{display:none}}
+.foot{font-size:13px;color:var(--muted);margin-top:14px}
+
+.panel{background:var(--soft);border-radius:18px;padding:22px;margin-top:22px}
+.panel h3{margin:0 0 14px;font-size:19px}
+.split{display:grid;grid-template-columns:200px 1fr;gap:22px;align-items:center}
+@media (max-width:640px){.split{grid-template-columns:1fr}.split svg.donut{margin:0 auto}}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;margin-top:16px}
+@media (max-width:640px){.legend{grid-template-columns:1fr}}
+.legend div{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.legend i{width:12px;height:12px;border-radius:3px;margin-top:5px;flex:none}
+.legend .p{margin-left:auto;font-weight:800}
+.legend small{display:block;color:var(--muted)}
+.status{border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.status.good{background:var(--good-soft)}.status.good b.h{color:var(--good)}
+.status.warn{background:var(--warn-soft)}.status.warn b.h{color:var(--warn)}
+.status.bad{background:var(--bad-soft)}.status.bad b.h{color:var(--bad)}
+.status b.h{display:block;font-size:18px}
+.status .ic{font-size:22px;line-height:1.2}
+.checks{display:grid;gap:8px;margin-top:12px;font-size:14px}
+.checks div{display:flex;gap:8px}
+.todo{background:var(--card);border-left:4px solid var(--accent);border-radius:12px;padding:16px 18px;margin-top:16px;font-size:15px}
+.todo p{margin:0 0 8px}.todo p:last-child{margin:0}
+details{margin-top:14px;font-size:14px}
+details summary{cursor:pointer;font-weight:600}
+details p{color:var(--muted);margin:8px 0 0}
+
+.timeline{width:100%;height:auto;display:block;margin-top:6px}
+
+.cta{background:var(--brand);color:var(--brand-ink);border-radius:22px;padding:30px;margin:22px 0}
+.cta h2{font-family:"Fraunces",serif;font-size:30px;margin:0 0 8px}
+.cta p{opacity:.85;margin:0 0 18px;max-width:560px}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:99px;padding:13px 22px;font-weight:700;text-decoration:none;border:1.5px solid transparent}
+.btn.pri{background:var(--accent);color:#fff}
+.btn.ghost{border-color:currentColor;color:inherit;background:transparent}
+.btn.dark{background:var(--brand);color:var(--brand-ink)}
+.cta .who{font-size:13px;opacity:.75;margin-top:16px}
+.toast{font-size:14px;margin-top:10px;min-height:20px;opacity:.9}
+
+.menu{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:26px 0}
+@media (max-width:860px){.menu{grid-template-columns:1fr}}
+@media (max-width:640px){.menu{grid-template-columns:1fr}}
+.tool{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px;transition:transform .15s, box-shadow .15s}
+.tool:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.07)}
+.tool .em{font-size:38px}
+.tool h3{font-family:"Fraunces",serif;font-size:26px;margin:10px 0 6px}
+.tool p{color:var(--muted);margin:0 0 16px}
+.tool .go{font-weight:700;color:var(--accent)}
+
+.cl{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer;align-items:flex-start}
+.cl:last-of-type{border-bottom:0}
+.cl .box{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line);flex:none;display:grid;place-items:center;margin-top:2px;background:var(--card)}
+.cl.on .box{background:var(--good);border-color:var(--good);color:#fff}
+.cl h4{margin:0;font-size:16px}
+.cl p{margin:3px 0 0;color:var(--muted);font-size:14px}
+.cl.on h4{text-decoration:line-through;text-decoration-color:var(--good)}
+.pbar{height:10px;background:var(--soft);border-radius:99px;overflow:hidden;margin-top:14px}
+.pbar i{display:block;height:100%;background:var(--good);border-radius:99px;transition:width .3s}
+.ready{margin-top:12px;font-size:15px}
+
+.slider{margin:14px 0}
+.slider .top{display:flex;justify-content:space-between;align-items:baseline}
+.slider .top b{font-size:22px}
+input[type=range]{width:100%;accent-color:var(--brand);height:28px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+@media (max-width:640px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--soft);border-radius:14px;padding:14px 16px}
+.stat b{display:block;font-family:"Fraunces",serif;font-size:28px;color:var(--brand);line-height:1.1}
+.stat.alt b{color:var(--accent)}
+.stat.dim b{color:var(--muted)}
+.stat span{font-size:14px;display:block;margin-top:4px}
+.stat small{color:var(--muted);font-size:13px}
+.chart{width:100%;height:auto;display:block}
+.keys{display:flex;flex-wrap:wrap;gap:16px;font-size:14px;margin-top:6px}
+.keys i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+
+.acc{border:1.5px solid var(--line);border-radius:16px;margin-top:10px;overflow:hidden}
+.acc>button{width:100%;display:flex;gap:14px;align-items:center;background:var(--card);border:0;padding:16px;text-align:left}
+.acc>button .em{font-size:28px}
+.acc>button b{display:block;font-size:17px}
+.acc>button small{color:var(--muted)}
+.acc>button .pm{margin-left:auto;font-size:22px;color:var(--muted);transition:transform .2s}
+.acc.open>button .pm{transform:rotate(45deg)}
+.acc .body{display:none;padding:0 16px 16px 58px;font-size:15px}
+.acc.open .body{display:block}
+.acc .body ul{margin:6px 0;padding-left:18px}
+.acc .body li{margin:4px 0}
+.acc .body .why{color:var(--muted);font-size:14px}
+
+table.crash{width:100%;border-collapse:collapse;font-size:15px;margin-top:8px}
+table.crash th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 6px;border-bottom:1.5px solid var(--line)}
+table.crash td{padding:12px 6px;border-bottom:1px solid var(--line)}
+table.crash td.f{color:var(--bad);font-weight:700;white-space:nowrap}
+.flag{background:var(--bad-soft);border-radius:14px;padding:14px 16px;margin-top:16px;font-size:15px}
+.tldr{background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:16px 18px;margin-top:16px;font-size:15px}
+.tldr .pill{background:var(--accent);color:#fff;border-radius:6px;padding:1px 7px;font-size:12px;font-weight:800;margin-right:6px}
+
+.grp{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:18px 0 2px}
+.grp:first-child{margin-top:4px}
+.cl a{font-weight:600}
+.r-out{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+@media (max-width:640px){.r-out{grid-template-columns:1fr}}
+.helper{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.levers{display:grid;gap:8px;margin-top:10px}
+.lever{display:flex;justify-content:space-between;gap:12px;background:var(--card);border-radius:12px;padding:12px 14px;font-size:15px;align-items:center}
+.lever b{white-space:nowrap}
+.incbar{display:flex;height:34px;border-radius:10px;overflow:hidden;margin:10px 0 8px;background:var(--card)}
+.incbar i{display:block;height:100%}
+.stream{display:grid;grid-template-columns:44px 1fr 150px;gap:14px;align-items:center;border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:10px;background:var(--card)}
+.stream.on{border-color:var(--good);background:linear-gradient(90deg,var(--good-soft),var(--card) 60%)}
+.stream .em{font-size:28px;text-align:center}
+.stream b{display:block;font-size:16px}
+.stream small{display:block;color:var(--muted);font-size:13px;line-height:1.45}
+.stream .pc{font-size:13px;margin-top:4px}
+.stream .pc span{margin-right:10px}
+.stream .inp{margin:0;height:44px}
+@media (max-width:640px){.stream{grid-template-columns:36px 1fr}.stream .inp{grid-column:1/-1}}
+.count{font-family:"Fraunces",serif;font-size:44px;font-weight:700;color:var(--brand);line-height:1}
+.permit{background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:16px 18px;margin-top:12px}
+.permit b.big{font-family:"Fraunces",serif;font-size:30px;color:var(--accent);display:block;line-height:1.1}
+.kids{display:grid;gap:8px;margin-top:10px}
+.kid{display:grid;grid-template-columns:110px 1fr 110px;gap:10px;align-items:center;font-size:14px}
+.kid .bar{height:22px;border-radius:6px;background:var(--card);overflow:hidden;display:flex}
+.kid .bar i{display:block;height:100%}
+.kid .v{text-align:right;font-weight:700}
+.opt{background:var(--card);border-radius:12px;padding:14px 16px;margin-top:10px;font-size:15px}
+.opt b.t{display:block;margin-bottom:2px}
+details.more{margin-top:16px;border-top:1px dashed var(--line);padding-top:12px}
+details.more summary{color:var(--accent);font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media (max-width:640px){.tiles{grid-template-columns:1fr 1fr}}
+.tile{border:1.5px solid var(--line);background:var(--soft);border-radius:16px;padding:12px 10px;text-align:center}
+.tile.on{border-color:var(--good);background:var(--good-soft)}
+.tile .tb{border:0;background:none;width:100%;padding:0}
+.tile .tb .em{font-size:28px;display:block}
+.tile .tb b{display:block;font-size:14px;margin-top:2px}
+.tile .tb small{display:block;font-size:12px;color:var(--muted)}
+.tile .inp{height:38px;margin-top:8px;padding:0 8px;background:var(--card)}
+.tile .inp input{font-size:15px}
+.tile:not(.on) .inp{display:none}
+.answer{background:var(--soft);border-radius:18px;padding:20px}
+.ans-row{display:flex;gap:22px;align-items:center}
+@media (max-width:640px){.ans-row{flex-direction:column;align-items:flex-start;gap:10px}}
+.pcrow{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.pcrow .em{font-size:22px}
+.growcards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 0}
+@media (max-width:760px){.growcards{grid-template-columns:1fr 1fr}}
+.gc{background:var(--soft);border-radius:14px;padding:14px;border-top:4px solid var(--gc)}
+.gc .rt{font-size:18px;font-weight:800}
+.gc .r{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.gc .v{font-family:"Fraunces",serif;font-weight:700;font-size:24px;line-height:1.15;margin:6px 0 2px;color:var(--ink)}
+.gc small{display:block;color:var(--muted);font-size:12.5px;line-height:1.4}
+.gc small b{color:var(--good)}
+body:not(.is-couple) .cpl{display:none!important}
+body.is-couple .solo{display:none!important}
+.sharegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media (max-width:640px){.sharegrid{grid-template-columns:1fr}}
+.person{background:var(--soft);border-radius:16px;padding:18px}
+.person h4{margin:0 0 10px;font-size:18px}
+.person .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:15px}
+.person .row:last-child{border-bottom:0;font-weight:800}
+.person .row span:last-child{font-weight:700}
+.thline{display:block;font-size:13px;color:var(--good);font-weight:600;margin-top:6px}
+.nocpf{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);font-weight:500;margin-top:4px}
+.nocpf input{accent-color:var(--brand)}
+table.plan tr.how td{padding:0 6px 12px;border-bottom:1px solid var(--line);text-align:left}
+table.plan tr.how summary{font-size:13px;color:var(--accent);font-weight:700;cursor:pointer}
+.hwbox{background:var(--soft);border-radius:12px;padding:12px 14px;margin-top:8px;max-width:620px}
+.hw{display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.hw i{width:12px;height:12px;border-radius:3px;flex:none}
+.hw div{flex:1}.hw small{display:block;color:var(--muted);font-size:12.5px}
+.hw .v{white-space:nowrap}
+.hw.tot{border-bottom:0;padding-top:10px}.hw.tot .v{font-size:17px;color:var(--brand)}
+footer{padding:26px 0 50px;text-align:center;color:var(--muted);font-size:13px}
+footer .sig{font-family:"Fraunces",serif;font-style:italic;font-size:30px;color:var(--ink)}
+footer p{max-width:620px;margin:8px auto}
+.view{display:none}.view.on{display:block}
+.clearbtn{margin-left:8px;border:1.5px solid rgba(255,255,255,.45);background:transparent;color:var(--brand-ink);border-radius:99px;padding:6px 12px;font-size:13px;font-weight:700;white-space:nowrap}
+.inp input::placeholder{font-weight:500;color:#B5AEA3;opacity:1}
+.clearbtn:hover{background:rgba(255,255,255,.12)}
+.clearbtn.arm{background:var(--accent);border-color:var(--accent);color:#fff}
+@media (max-width:640px){.clearbtn{padding:6px 9px;font-size:12.5px;margin-left:2px}.clearbtn .lg{display:none}}
+</style>
+</head>
+<body data-theme="sage">
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="mark">C✌</div>
+    <div><div class="name">Celine's Cents</div></div>
+    <div class="tag">· money, made a little clearer</div>
+    <nav>
+      <a href="#home" data-nav="home">Tools</a>
+      <a href="#goals" data-nav="goals">Goals</a>
+      <a href="#invest" data-nav="invest">Investing</a>
+      <a href="#retire" data-nav="retire">Retirement</a>
+    </nav>
+    <button type="button" class="clearbtn" id="clear-all" title="Clear every field in all three tools, ready for a new person">↺ <span class="lg">Clear all</span></button>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ HOME ============ -->
+<section class="view" id="v-home">
+  <div class="hero">
+    <div class="eyebrow">Free money tools</div>
+    <h1>Your money, <em>with a plan.</em></h1>
+    <p class="lede">Three quick, no-jargon tools. Work out what your goals really cost and how much to set aside, then learn how to start investing without stress.</p>
+  </div>
+  <div class="menu">
+    <a class="tool" href="#goals">
+      <div class="em">🎯</div>
+      <h3>Goals Planner</h3>
+      <p>Put a price and a date on your goals. See exactly what to set aside each month, and whether your pay can carry it.</p>
+      <span class="go">Plan my goals →</span>
+    </a>
+    <a class="tool" href="#invest">
+      <div class="em">🌱</div>
+      <h3>Investing Starter</h3>
+      <p>Am I ready? What does waiting cost? Where should each goal's money sit? Honest answers in five minutes.</p>
+      <span class="go">Start here →</span>
+    </a>
+    <a class="tool" href="#retire">
+      <div class="em">🌅</div>
+      <h3>Retirement Ready</h3>
+      <p>For 50 and above. A checklist of what to settle (will, LPA, CPF nomination) and a plan for how long your money lasts.</p>
+      <span class="go">Check my retirement →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ============ GOALS ============ -->
+<section class="view" id="v-goals">
+  <div class="hero">
+    <div class="eyebrow">Goals planner</div>
+    <h1>Put a price and a date <em>on your dreams.</em></h1>
+    <p class="lede">Three steps, about two minutes. You'll see how much to set aside each month for every goal, without touching what you need to live on.</p>
+  </div>
+
+  <div class="card">
+    <div class="step"><b>1</b><h2>About you</h2></div>
+    <p class="sub">Rough numbers are fine. Everything stays in your browser.</p>
+    <div class="ratebar" style="margin:0 0 16px">Planning for
+      <div class="seg" id="seg-mode"><button data-v="solo" class="on"><b>Just me</b></button><button data-v="couple"><b>Us as a couple</b></button></div>
+    </div>
+    <div class="grp cpl">You</div>
+    <div class="grid g3">
+      <label class="f full">Your name <small>(goes on your plan)</small>
+        <div class="inp"><input id="i-name" placeholder="e.g. Rachel" autocomplete="off"></div></label>
+      <label class="f">Age
+        <div class="inp"><input id="i-age" inputmode="numeric" value="28"></div></label>
+      <div class="f">Monthly salary <small>before CPF</small>
+        <div class="inp"><span>$</span><input id="i-pay" inputmode="numeric" value="5000"></div>
+        <span class="thline" id="th-1"></span>
+        <label class="nocpf"><input type="checkbox" id="i-nocpf"> No CPF (foreigner)</label></div>
+      <label class="f"><span class="solo">Savings in the bank</span><span class="cpl">Your savings</span> <small>today</small>
+        <div class="inp"><span>$</span><input id="i-sav" inputmode="numeric" value="15000"></div></label>
+      <label class="f"><span class="solo">Insurance premiums</span><span class="cpl">Your insurance premiums</span> <small>a month, cash</small>
+        <div class="inp"><span>$</span><input id="i-ins" inputmode="numeric" value="250"></div></label>
+      <label class="f"><span class="solo">CPF OA balance</span><span class="cpl">Your CPF OA</span> <small>today</small>
+        <div class="inp"><span>$</span><input id="i-oa" inputmode="numeric" value="0"></div>
+        <button type="button" class="linkbtn" id="oa-open">Not sure? Estimate it</button></label>
+    </div>
+    <div class="cpl">
+      <div class="grp" style="margin-top:22px">Your partner</div>
+      <div class="grid g3">
+        <label class="f">Partner's name<div class="inp"><input id="p-name" placeholder="e.g. Daniel" autocomplete="off"></div></label>
+        <label class="f">Age<div class="inp"><input id="p-age" inputmode="numeric" value="30"></div></label>
+        <div class="f">Monthly salary <small>before CPF</small><div class="inp"><span>$</span><input id="p-pay" inputmode="numeric" value="5600"></div>
+          <span class="thline" id="th-2"></span>
+          <label class="nocpf"><input type="checkbox" id="p-nocpf"> No CPF (foreigner)</label></div>
+        <label class="f">Savings <small>today</small><div class="inp"><span>$</span><input id="p-sav" inputmode="numeric" value="20000"></div></label>
+        <label class="f">Insurance premiums <small>a month, cash</small><div class="inp"><span>$</span><input id="p-ins" inputmode="numeric" value="250"></div></label>
+        <label class="f">CPF OA <small>today</small><div class="inp"><span>$</span><input id="p-oa" inputmode="numeric" value="0"></div></label>
+      </div>
+    </div>
+    <div class="grp cpl" style="margin-top:22px">Together, as a household</div>
+    <div class="grid g3" style="margin-top:14px">
+      <label class="f"><span class="solo">Living costs</span><span class="cpl">Household living costs</span> <small>a month, excl. saving &amp; investing</small>
+        <div class="inp"><span>$</span><input id="i-live" inputmode="numeric" value="1800"></div></label>
+      <label class="f">Already saving <small class="solo">a month</small><small class="cpl">a month, together</small>
+        <div class="inp"><span>$</span><input id="i-cs" inputmode="numeric" value="500"></div></label>
+      <label class="f">Already investing <small class="solo">a month</small><small class="cpl">a month, together</small>
+        <div class="inp"><span>$</span><input id="i-ci" inputmode="numeric" value="0"></div></label>
+    </div>
+    <div class="oa-est" id="oa-est" hidden>
+      <div><b>Estimate my CPF OA</b><small>From your salary, assuming pay rose about 3% a year since you started, the 2026 CPF rates, 2.5% OA interest, and no OA used yet for housing or education. Your CPF app shows the real figure.</small></div>
+      <label class="f">You started full-time work at age
+        <div class="inp"><input id="i-start" inputmode="numeric" value="23"></div></label>
+      <label class="f cpl">Your partner started at age
+        <div class="inp"><input id="p-start" inputmode="numeric" value="24"></div></label>
+      <div class="oa-res" id="oa-res"></div>
+      <button type="button" class="btn dark" id="oa-use">Use this estimate</button>
+    </div>
+    <div class="callout" id="free-line"></div>
+  </div>
+
+  <div class="card">
+    <div class="step"><b>2</b><h2>Pick your goals</h2></div>
+    <p class="sub">Choose a goal, then a style. Tap a picked style again to remove it. Prices are in today's dollars, and you can edit them.</p>
+    <div class="starter">
+      <div><b>No specific goals yet?</b> That's normal. Start with the basics: a retirement that keeps your current lifestyle, and a "future me" fund for whatever comes up next.</div>
+      <button type="button" class="btn dark" id="starter-btn">Start with the basics</button>
+    </div>
+    <div class="cats" id="cats"></div>
+    <p class="catblurb" id="catblurb"></p>
+    <div class="tiers" id="tiers"></div>
+    <div class="mygoals">
+      <h3>✓ Your goals</h3>
+      <div id="mygoals"></div>
+    </div>
+  </div>
+
+  <div class="card" id="plan-card">
+    <div class="step"><b>3</b><h2>Your plan, made clear</h2></div>
+    <div class="prepared" id="prepared"></div>
+    <p class="headline" id="headline"></p>
+    <div class="ratebar">Long-term goals grow at
+      <div class="seg" id="seg-rate">
+        <button data-r="0.04"><b>4%</b><small>cautious</small></button>
+        <button data-r="0.06" class="on"><b>6%</b><small>moderate</small></button>
+        <button data-r="0.08"><b>8%</b><small>growth</small></button>
+      </div>
+    </div>
+    <div style="overflow-x:auto"><table class="plan" id="plan"></table></div>
+    <p class="foot" id="plan-foot"></p>
+
+    <div class="panel">
+      <h3>Your goals on a timeline</h3>
+      <svg class="timeline" id="timeline" viewBox="0 0 760 150" role="img" aria-label="Timeline of goals"></svg>
+    </div>
+
+    <div class="panel">
+      <h3>How your take-home pay could work</h3>
+      <div class="split">
+        <svg class="donut" id="donut" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Split of take-home pay"></svg>
+        <div id="status"></div>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="todo" id="todo"></div>
+      <details>
+        <summary>Where do the 15% and 10% come from?</summary>
+        <p>They're rules of thumb from the Basic Financial Planning Guide by MAS and MoneySense: spend at most 15% of take-home pay on insurance protection, invest at least 10% for your goals, and keep about 6 months of expenses as an emergency fund. They're starting points, not rules for everyone.</p>
+      </details>
+    </div>
+  </div>
+
+  <div class="card cpl" id="share-card">
+    <div class="step"><b>4</b><h2>How you two could share it</h2></div>
+    <p class="sub">Two common ways couples split shared costs. Pick the one that feels fair to you both.</p>
+    <div class="seg" id="seg-share"><button data-v="income" class="on"><b>By income</b><small>bigger earner puts in more</small></button><button data-v="half"><b>50 / 50</b><small>equal amounts</small></button></div>
+    <div id="share-out" style="margin-top:18px"></div>
+  </div>
+
+  <div class="cta">
+    <h2>Let's make it happen</h2>
+    <p>Send me your plan. I'll look at the best way to get you there and walk you through it over a 30-minute chat. No obligation.</p>
+    <div class="btns">
+      <a class="btn pri" id="tg-goals" href="https://t.me/celineesim">Send my plan on Telegram</a>
+      <button class="btn ghost" id="copy-goals">Copy my plan</button>
+      <button class="btn ghost pdfbtn" id="pdf-goals" hidden>Download PDF summary</button>
+    </div>
+    <div class="toast" id="toast-goals"></div>
+    <div class="who">Celine Sim · Wealth Planner, Alpha Wealth Financial Advisers · Telegram @celineesim</div>
+  </div>
+</section>
+
+<!-- ============ INVEST ============ -->
+<section class="view" id="v-invest">
+  <div class="hero">
+    <div class="eyebrow">Investing starter</div>
+    <h1>Start small. <em>Start right.</em></h1>
+    <p class="lede">Am I ready? Is now a good time? Where should the money go? Straight answers, without the jargon.</p>
+  </div>
+
+  <div class="card">
+    <div class="step"><b>1</b><h2>Am I ready to invest?</h2></div>
+    <p class="sub">Tick off what you've done. Do them in order: the first four protect you so you never have to sell investments at a bad time.</p>
+    <div id="checklist"></div>
+    <div class="pbar"><i id="pbar"></i></div>
+    <div class="ready" id="ready"></div>
+  </div>
+
+  <div class="card">
+    <div class="step"><b>2</b><h2>What does waiting cost?</h2></div>
+    <p class="sub">Same monthly amount, three start dates. Drag the sliders.</p>
+    <div class="slider"><div class="top"><span>Invest every month</span><b id="o-amt"></b></div>
+      <input type="range" id="r-amt" min="100" max="3000" step="50" value="300"></div>
+    <div class="slider"><div class="top"><span>Start at age</span><b id="o-age"></b></div>
+      <input type="range" id="r-age" min="18" max="55" step="1" value="25"></div>
+    <div class="ratebar" style="margin:6px 0 0">Growth a year (illustration)
+      <div class="seg" id="seg-rate2">
+        <button data-r="0.04"><b>4%</b></button>
+        <button data-r="0.06" class="on"><b>6%</b></button>
+        <button data-r="0.08"><b>8%</b></button>
+      </div>
+    </div>
+    <div class="stats" id="wait-stats"></div>
+    <svg class="chart" id="wait-chart" viewBox="0 0 760 300" role="img" aria-label="Growth by age"></svg>
+    <div class="keys" id="wait-keys"></div>
+    <p class="foot">Illustration only, at age 65, money added at the start of each month and growing at the rate you pick. Real returns go up and down and aren't guaranteed.</p>
+  </div>
+
+  <div class="card">
+    <div class="step"><b>3</b><h2>How much could it grow?</h2></div>
+    <p class="sub">Pick an amount and how long you'll stay invested. See what it could become at different growth rates.</p>
+    <div class="grid g2">
+      <label class="f">Invest every month<div class="inp"><span>$</span><input id="gr-m" inputmode="numeric" value="500"></div></label>
+      <label class="f">Plus a lump sum today <small>optional</small><div class="inp"><span>$</span><input id="gr-l" inputmode="numeric" value="0"></div></label>
+    </div>
+    <div class="slider"><div class="top"><span>For how many years</span><b id="gr-yo"></b></div>
+      <input type="range" id="gr-y" min="1" max="40" step="1" value="20"></div>
+    <p id="gr-put" style="margin:14px 0 0;font-size:15px"></p>
+    <div class="growcards" id="gr-cards"></div>
+    <svg class="chart" id="gr-chart" viewBox="0 0 760 280" role="img" aria-label="Growth at different rates"></svg>
+    <div class="keys" id="gr-keys"></div>
+    <p class="foot">Illustration only. Money added at the start of each month, growing at a steady yearly rate before fees. Real investments go up and down, and returns aren't guaranteed. Figures aren't adjusted for inflation.</p>
+  </div>
+
+  <div class="card">
+    <div class="step"><b>4</b><h2>Why steady beats waiting</h2></div>
+    <p class="sub">A made-up example. A fund falls 40% over 9 months, then takes 15 months to crawl back to exactly where it started. You keep investing <b id="dca-amt"></b> every month throughout.</p>
+    <svg class="chart" id="dca-chart" viewBox="0 0 760 220" role="img" aria-label="Price path and units bought"></svg>
+    <div class="stats" id="dca-stats"></div>
+    <div class="tldr"><span class="pill">TL;DR</span><span id="dca-tldr"></span></div>
+  </div>
+
+  <div class="card">
+    <div class="step"><b>5</b><h2>Where each goal's money could sit</h2></div>
+    <p class="sub">The sooner you need the money, the safer it should be. These match the buckets in the Goals Planner.</p>
+    <div id="buckets"></div>
+    <div class="callout warn" style="margin-top:16px"><b>General examples, not advice for you.</b> The right mix depends on your goals, other money and how you'd feel watching your balance drop. Let's work it out together.</div>
+  </div>
+
+  <div class="card">
+    <div class="step"><b>6</b><h2>Markets fall. That's normal.</h2></div>
+    <p class="sub">Big falls happen every few years. Here are the biggest recent ones, and how long the S&amp;P 500 took to get back to its old high after hitting bottom.</p>
+    <table class="crash">
+      <thead><tr><th>Crash (S&amp;P 500)</th><th>Fall</th><th>Back to old high</th></tr></thead>
+      <tbody>
+        <tr><td>Dot-com bust, 2000 to 2002</td><td class="f">−49%</td><td>about 4½ years</td></tr>
+        <tr><td>Global Financial Crisis, 2007 to 2009</td><td class="f">−57%</td><td>about 4 years</td></tr>
+        <tr><td>Covid-19, 2020</td><td class="f">−34%</td><td>about 5 months</td></tr>
+        <tr><td>Interest rate shock, 2022</td><td class="f">−25%</td><td>about 15 months</td></tr>
+        <tr><td>Tariff shock, 2025</td><td class="f">−19%</td><td>under 3 months</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:16px">Investing every month through a fall means buying at sale prices. Selling in a panic is what turns a dip into a real loss. That's why money you'll need within a few years shouldn't be in the market at all.</p>
+    <div class="flag">🚩 <b>If anyone promises guaranteed high returns, walk away.</b> Real investments go up and down. Check the <a href="https://www.mas.gov.sg/investor-alert-list">MAS Investor Alert List</a>, and make sure whoever advises you is on the <a href="https://eservices.mas.gov.sg/rr/">MAS Register of Representatives</a> (mine is CSY300926263).</div>
+    <p class="foot">Peak-to-bottom falls in the S&amp;P 500 price index, rounded. Past performance doesn't guarantee future results.</p>
+  </div>
+
+  <div class="cta">
+    <h2>Not sure where to start?</h2>
+    <p>Message me. We'll check you're ready first (emergency fund, protection), then find a monthly amount that fits your pay. No pressure to buy anything.</p>
+    <div class="btns">
+      <a class="btn pri" id="tg-invest" href="https://t.me/celineesim">Message me on Telegram</a>
+      <a class="btn ghost" href="#goals">Plan my goals →</a>
+    </div>
+    <div class="toast" id="toast-invest"></div>
+    <div class="who">Celine Sim · Wealth Planner, Alpha Wealth Financial Advisers · Telegram @celineesim</div>
+  </div>
+</section>
+
+<!-- ============ RETIRE ============ -->
+<section class="view" id="v-retire">
+  <div class="hero">
+    <div class="eyebrow">Retirement game plan · 50 and above</div>
+    <h1>It's not how much you retire with. <em>It's how much income you create.</em></h1>
+    <p class="lede">Three questions, one answer: will your money last, and how much can you enjoy spending?</p>
+  </div>
+
+  <div class="card">
+    <div class="step"><b>1</b><h2>What do you need a month?</h2></div>
+    <p class="sub">In today's dollars, for the life you want in retirement.</p>
+    <div class="grid g3">
+      <label class="f full">Your name <small>(optional, goes on your plan)</small><div class="inp"><input id="rt-name" placeholder="e.g. Mr Tan" autocomplete="off"></div></label>
+      <label class="f">Your age<div class="inp"><input id="rt-age" inputmode="numeric" value="55"></div></label>
+      <label class="f">Monthly spending <small>in retirement</small><div class="inp"><span>$</span><input id="rt-need" inputmode="numeric" value="3600"></div></label>
+      <label class="f">Savings &amp; investments <small>excl. CPF and home</small><div class="inp"><span>$</span><input id="rt-sav" inputmode="numeric" value="600000"></div></label>
+    </div>
+    <details class="more"><summary>Not sure? Work out my monthly spending</summary>
+      <div class="grid g3" style="margin-top:12px">
+      <label class="f">🏠 Home <small>loan, S&amp;CC, utilities</small><div class="inp"><span>$</span><input class="ex" data-k="home" data-e="1" inputmode="numeric" value="400"></div></label>
+      <label class="f">🍲 Food &amp; daily living<div class="inp"><span>$</span><input class="ex" data-k="food" data-e="1" inputmode="numeric" value="1200"></div></label>
+      <label class="f">🚗 Car &amp; transport<div class="inp"><span>$</span><input class="ex" data-k="car" data-e="1" inputmode="numeric" value="300"></div></label>
+      <label class="f">🛡️ Insurance premiums<div class="inp"><span>$</span><input class="ex" data-k="ins" data-e="1" inputmode="numeric" value="400"></div></label>
+      <label class="f">🩺 Healthcare <small>clinic, meds, dental</small><div class="inp"><span>$</span><input class="ex" data-k="health" data-e="1" inputmode="numeric" value="200"></div></label>
+      <label class="f">👨‍👩‍👧 Family &amp; gifts <small>allowances, grandkids</small><div class="inp"><span>$</span><input class="ex" data-k="family" inputmode="numeric" value="300"></div></label>
+      <label class="f">🎨 Hobbies &amp; fun<div class="inp"><span>$</span><input class="ex" data-k="fun" inputmode="numeric" value="200"></div></label>
+      <label class="f">✈️ Travel <small>a year</small><div class="inp"><span>$</span><input class="ex" data-k="travel" data-y="1" inputmode="numeric" value="6000"></div></label>
+      <label class="f">📦 Others<div class="inp"><span>$</span><input class="ex" data-k="other" inputmode="numeric" value="100"></div></label>
+    </div>
+      <div class="incbar" id="ex-bar"></div>
+      <div class="legend" id="ex-legend"></div>
+    </details>
+  </div>
+
+  <div class="card">
+    <div class="step"><b>2</b><h2>Which income streams will you have?</h2></div>
+    <p class="sub">Tap each one you have or expect, then enter roughly how much it pays a month. If an annuity will be bought with the savings you entered in step 1, lower that savings figure by the amount you'll put in.</p>
+    <div class="tiles" id="streams"></div>
+    <details class="more"><summary>The pros and cons of each</summary><div id="stream-pc"></div></details>
+  </div>
+
+  <div class="card" id="r-plan">
+    <div class="step"><b>3</b><h2>Your retirement game plan</h2></div>
+    <div class="answer">
+      <div class="ans-row">
+        <div><div class="count" id="ans-count"></div><div class="foot" style="margin:2px 0 0">income streams</div></div>
+        <div style="flex:1">
+          <div id="ans-cover"></div>
+          <div class="pbar" style="height:14px;margin-top:8px"><i id="ans-bar" style="background:var(--brand)"></i></div>
+        </div>
+      </div>
+      <div id="r-status" style="margin-top:16px"></div>
+      <div id="r-permit"></div>
+      <div class="todo" id="r-next"></div>
+    </div>
+    <details class="more"><summary>Change my assumptions</summary>
+      <div class="grid g3" style="margin-top:12px">
+        <label class="f">Stop working at<div class="inp"><input id="rt-ret" inputmode="numeric" value="63"></div></label>
+        <label class="f">Plan until age<div class="inp"><input id="rt-until" inputmode="numeric" value="90"></div></label>
+        <label class="f">Still adding <small>a month until you stop</small><div class="inp"><span>$</span><input id="rt-add" inputmode="numeric" value="1500"></div></label>
+      </div>
+      <div class="ratebar" style="margin:14px 0 0">CPF LIFE starts at
+        <div class="seg" id="r-seg-start"><button data-v="65" class="on"><b>65</b></button><button data-v="70"><b>70</b><small>~34% more</small></button></div></div>
+      <div class="ratebar" style="margin:12px 0 0">Savings grow at
+        <div class="seg" id="r-seg-rate"><button data-v="0.03"><b>3%</b></button><button data-v="0.045" class="on"><b>4.5%</b></button><button data-v="0.06"><b>6%</b></button></div></div>
+      <p class="foot">Inflation 2.5% a year. CPF LIFE Standard Plan payouts stay level, so they buy a little less each year.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <div class="step"><b>+</b><h2>Go deeper</h2></div>
+    <p class="sub">Optional. Open whatever matters to you.</p>
+    <div class="acc"><button><span class="em">📈</span><span><b>Year by year, and my paycheck buckets</b><small>See your savings over time and how to split them</small></span><span class="pm">+</span></button><div class="body">
+      <div class="r-out" id="r-out"></div>
+      <svg class="chart" id="r-chart" viewBox="0 0 760 280" role="img" aria-label="Retirement savings by age"></svg>
+      <div class="keys"><span><i style="background:var(--brand)"></i>Your savings</span><span><i style="background:var(--accent)"></i>Stop work</span><span><i style="background:var(--good)"></i>CPF LIFE starts</span></div>
+      <h3 style="margin:22px 0 6px">Three buckets</h3>
+      <p class="foot" style="margin:0 0 10px">Retirees spend with confidence when the next few years are already safe.</p>
+      <div class="stats" id="buckets-r"></div>
+      <h3 style="margin:22px 0 6px">Ways to change the result</h3>
+      <div class="levers" id="r-levers"></div>
+    </div></div>
+    <div class="acc"><button><span class="em">🧭</span><span><b>Check my investment mix</b><small>Singapore vs US, cash vs shares, what stands out</small></span><span class="pm">+</span></button><div class="body">
+      <div class="f" style="font-size:14px;font-weight:600">My approach is mostly <small style="font-weight:400;color:var(--muted)">(pick any)</small></div>
+    <div class="helper" id="thesis"></div>
+    <div class="grid g3" style="margin-top:16px">
+      <label class="f">🇸🇬 Singapore stocks &amp; REITs<div class="inp"><span>$</span><input class="al" data-k="sg" inputmode="numeric" value="200000"></div></label>
+      <label class="f">🇺🇸 US stocks<div class="inp"><span>$</span><input class="al" data-k="us" inputmode="numeric" value="50000"></div></label>
+      <label class="f">🌏 Other markets<div class="inp"><span>$</span><input class="al" data-k="ot" inputmode="numeric" value="0"></div></label>
+      <label class="f">📜 Bonds &amp; bond funds<div class="inp"><span>$</span><input class="al" data-k="bd" inputmode="numeric" value="0"></div></label>
+      <label class="f">🏦 Cash, FD, T-bills, SSB<div class="inp"><span>$</span><input class="al" data-k="cs" inputmode="numeric" value="350000"></div></label>
+      <label class="f">🪙 Others <small>gold, crypto, private</small><div class="inp"><span>$</span><input class="al" data-k="ox" inputmode="numeric" value="0"></div></label>
+    </div>
+    <div class="panel">
+      <h3>Your mix <span id="al-total" style="font-weight:500;color:var(--muted)"></span></h3>
+      <div class="incbar" id="al-bar"></div>
+      <div class="legend" id="al-legend"></div>
+      <h3 style="margin-top:20px">What stands out</h3>
+      <div class="levers" id="al-notes"></div>
+    </div>
+</div></div>
+    <div class="acc"><button><span class="em">🏡</span><span><b>My estate: keep it fair, leave more</b><small>When one child keeps the home, and growing your legacy</small></span><span class="pm">+</span></button><div class="body">
+      <p class="foot" style="margin:0 0 10px">Family arguments over an inheritance rarely come from greed. They come from someone feeling less loved.</p>
+      <div class="panel" style="margin-top:0">
+      <h3>Fair, when one child wants to keep the home</h3>
+      <div class="grid g3">
+        <label class="f">Property value<div class="inp"><span>$</span><input id="es-prop" inputmode="numeric" value="1200000"></div></label>
+        <label class="f">Everything else <small>cash, investments, CPF</small><div class="inp"><span>$</span><input id="es-oth" inputmode="numeric" value="400000"></div></label>
+        <label class="f">Number of children<div class="inp"><input id="es-n" inputmode="numeric" value="3"></div></label>
+      </div>
+      <div id="es-out" style="margin-top:16px"></div>
+      <details><summary>And if everyone agrees to sell?</summary><p>It's simpler, but decide now: the lowest price you'd accept, how long to wait for it, which agent to use, and who makes the final call. Siblings who want to sell immediately and siblings who want to wait for a better price are a common source of conflict.</p></details>
+    </div>
+
+    <div class="panel">
+      <h3>Is there any reason you wouldn't want to leave behind more?</h3>
+      <div class="grid g2">
+        <label class="f">Your estate today<div class="inp"><span>$</span><input id="em-now" inputmode="numeric" value="2000000"></div></label>
+        <label class="f">What you'd love to leave<div class="inp"><span>$</span><input id="em-want" inputmode="numeric" value="4000000"></div></label>
+      </div>
+      <div id="em-out" style="margin-top:16px"></div>
+    </div>
+</div></div>
+    <div class="acc"><button><span class="em">✅</span><span><b>Retirement checklist</b><small>Will, LPA, CPF nomination and 9 more</small></span><span class="pm">+</span></button><div class="body">
+      <div id="r-checklist"></div>
+      <div class="pbar"><i id="r-pbar"></i></div>
+      <div class="ready" id="r-ready"></div>
+    </div></div>
+  </div>
+
+  <div class="cta">
+    <h2>Let's build your game plan together</h2>
+    <p>Send me your answers. We'll turn your savings into income you can enjoy, and make sure what you've built reaches your family smoothly.</p>
+    <div class="btns">
+      <a class="btn pri" id="tg-retire" href="https://t.me/celineesim">Send my plan on Telegram</a>
+      <button class="btn ghost" id="copy-retire">Copy my plan</button>
+      <button class="btn ghost pdfbtn" id="pdf-retire" hidden>Download PDF summary</button>
+    </div>
+    <div class="toast" id="toast-retire"></div>
+    <div class="who">Celine Sim · Wealth Planner, Alpha Wealth Financial Advisers · Telegram @celineesim</div>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <div class="sig">Celine Sim</div>
+  <div>Wealth Planner · TAT Alliance · Alpha Wealth Financial Advisers Pte Ltd · MAS Rep. No. CSY300926263</div>
+  <p>For general information and education only. This isn't financial advice or a recommendation to buy any product. Projections are illustrations using the rates shown and aren't guaranteed; actual returns depend on market performance, fees and policy terms. Goal prices are rough Singapore estimates. Please speak with a licensed representative before making financial decisions.</p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var fmt=function(n){n=Math.round(n||0);return (n<0?"-$":"$")+Math.abs(n).toLocaleString("en-SG")};
+var fmtK=function(n){return n>=1e6?"$"+(n/1e6).toFixed(n>=1e7?0:1)+"M":n>=1e3?"$"+Math.round(n/1e3)+"k":"$"+Math.round(n)};
+var pct=function(x,d){return (x*100).toFixed(d==null?0:d)+"%"};
+var num=function(el){var v=parseFloat(String(el.value).replace(/[^0-9.]/g,""));return isFinite(v)?v:0};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+var store={get:function(k){try{return JSON.parse(localStorage.getItem("cc_"+k))}catch(e){return null}},set:function(k,v){try{localStorage.setItem("cc_"+k,JSON.stringify(v))}catch(e){}}};
+var BLANK=!!store.get("blank");
+var CLEAR_IDS=["i-name","i-age","i-pay","i-sav","i-ins","i-oa","p-name","p-age","p-pay","p-sav","p-ins","p-oa","i-live","i-cs","i-ci",
+  "rt-name","rt-age","rt-need","rt-sav","rt-add","es-prop","es-oth","em-now","em-want"];
+if(BLANK){CLEAR_IDS.forEach(function(id){var el=document.getElementById(id);if(el){if(el.value&&el.value!=="0"&&!el.placeholder)el.placeholder="e.g. "+el.value;el.value=""}});
+  $$(".ex,.al").forEach(function(el){if(el.value&&el.value!=="0")el.placeholder="e.g. "+el.value;el.value=""})}
+(function(){var b=$("#clear-all"),t=null;if(!b)return;
+  b.addEventListener("click",function(){
+    if(!b.classList.contains("arm")){b.classList.add("arm");b.innerHTML='Tap again to clear';t=setTimeout(function(){b.classList.remove("arm");b.innerHTML='↺ <span class="lg">Clear all</span>'},4000);return}
+    clearTimeout(t);
+    try{Object.keys(localStorage).forEach(function(k){if(k.indexOf("cc_")===0)localStorage.removeItem(k)})}catch(e){}
+    store.set("blank",true);
+    location.reload()})})();
+var YEAR=new Date().getFullYear();
+var INFL=0.025;
+
+
+/* ---------- routing ---------- */
+function route(){var h=(location.hash||"#home").slice(1);if(["home","goals","invest","retire"].indexOf(h)<0)h="home";
+  $$(".view").forEach(function(v){v.classList.toggle("on",v.id==="v-"+h)});
+  $$("[data-nav]").forEach(function(a){a.classList.toggle("on",a.dataset.nav===h)});
+  window.scrollTo(0,0)}
+window.addEventListener("hashchange",route);route();
+
+/* ---------- goal catalogue (today's dollars, indicative SG estimates) ---------- */
+var CATS=[
+ {id:"travel",em:"✈️",name:"Travel",yrs:2,blurb:"A trip to look forward to. Priced for two people, flights and stay.",tiers:[
+   {lv:"Budget",t:"Southeast Asia getaway",n:"1 week, budget flights and hotels",c:2500},
+   {lv:"Comfort",t:"Japan or Korea trip",n:"10 days, 4-star stays",c:7000},
+   {lv:"Luxury",t:"Europe, done properly",n:"2 weeks, premium economy",c:18000}]},
+ {id:"home",em:"🏠",name:"Home",yrs:5,blurb:"The 25% down payment on a place of your own. Your CPF OA is counted automatically, and you can split it with a partner. Excludes stamp duty and legal fees.",tiers:[
+   {lv:"Budget",t:"4-room BTO flat",n:"25% of $450,000 · HDB loan",c:112500,hdb:1},
+   {lv:"Comfort",t:"5-room resale flat",n:"25% of $800,000 · HDB loan",c:200000,hdb:1},
+   {lv:"Luxury",t:"3-bedroom condo",n:"25% of $1,800,000 · bank loan, min 5% cash",c:450000}]},
+ {id:"reno",em:"🛋️",name:"Reno",yrs:5,blurb:"Making the new place yours: renovation, furniture and appliances.",tiers:[
+   {lv:"Budget",t:"Essential BTO reno",n:"Flooring, carpentry, basics",c:60000},
+   {lv:"Comfort",t:"Full designer reno",n:"Interior designer, built-ins",c:80000},
+   {lv:"Luxury",t:"Condo luxury reno",n:"Premium finishes throughout",c:150000}]},
+ {id:"car",em:"🚗",name:"Car",yrs:5,blurb:"The cash down payment on a car. Car loans cover at most 60 to 70% of the price.",tiers:[
+   {lv:"Budget",t:"Used compact car",n:"30% of $110,000",c:33000},
+   {lv:"Comfort",t:"New Japanese sedan",n:"30% of $170,000",c:51000},
+   {lv:"Luxury",t:"Continental car",n:"40% of $320,000",c:128000}]},
+ {id:"wedding",em:"💍",name:"Wedding",yrs:3,blurb:"Your big day. Your share, before ang bao comes back in.",tiers:[
+   {lv:"Budget",t:"ROM and intimate dinner",n:"About 80 guests",c:20000},
+   {lv:"Comfort",t:"Hotel banquet",n:"About 300 guests, photos, gown",c:60000},
+   {lv:"Luxury",t:"Destination wedding",n:"Overseas, all-in",c:120000}]},
+ {id:"baby",em:"👶",name:"Baby",yrs:3,blurb:"From pregnancy to age 2: check-ups and delivery, confinement, infant care and baby essentials. Prices are before government support: a first or second child gets an $11,000 Baby Bonus Cash Gift, which you can take off the amount.",tiers:[
+   {lv:"Budget",t:"Public hospital, anchor infant care",n:"Check-ups & delivery ~$3k, subsidised infant care ~$12k, essentials ~$8k",c:23000},
+   {lv:"Comfort",t:"Private gynae, confinement nanny",n:"Check-ups & delivery ~$9k, confinement nanny ~$4k, partner/private infant care ~$17k, essentials ~$10k",c:40000},
+   {lv:"Luxury",t:"Private hospital, live-in helper",n:"Check-ups & delivery ~$20k, confinement nanny ~$5k, helper for 2 years ~$30k, essentials ~$15k",c:70000}]},
+ {id:"uni",em:"🎓",name:"Uni",yrs:18,blurb:"Your child's degree: tuition plus living costs for the whole course.",tiers:[
+   {lv:"Budget",t:"Local university",n:"4 years, living at home",c:60000},
+   {lv:"Comfort",t:"Australia",n:"3 years, tuition and living",c:280000},
+   {lv:"Luxury",t:"UK or US",n:"3 to 4 years, tuition and living",c:450000}]},
+ {id:"parents",em:"👵",name:"Parents",yrs:5,blurb:"A pot to support your parents, for allowance or medical bills.",tiers:[
+   {lv:"Budget",t:"Helping hand",n:"About $500 a month for 10 years",c:60000},
+   {lv:"Comfort",t:"Steady support",n:"About $1,000 a month for 10 years",c:120000},
+   {lv:"Luxury",t:"Full support",n:"About $2,000 a month for 10 years",c:240000}]},
+ {id:"biz",em:"💼",name:"Business",yrs:5,blurb:"Seed money for a side hustle or your own business.",tiers:[
+   {lv:"Budget",t:"Side hustle",n:"Online shop or freelance kit",c:15000},
+   {lv:"Comfort",t:"Small business",n:"Shopfront or studio setup",c:60000},
+   {lv:"Luxury",t:"Proper venture",n:"Lease, staff, 1 year runway",c:200000}]},
+ {id:"pet",em:"🐾",name:"Pet",yrs:1,blurb:"Getting set up for a furry family member: adoption or purchase, setup, first vet visits, plus a buffer for vet emergencies. Day-to-day costs (food, grooming, insurance: about $100 to $400 a month) go into your living costs. HDB flats allow up to 2 cats and 1 dog of an approved breed.",tiers:[
+   {lv:"Budget",t:"Adopt a cat",n:"Adoption, setup, licence, $2k vet buffer",c:3000},
+   {lv:"Comfort",t:"Adopt a dog",n:"Adoption, setup, training, $5k vet buffer",c:8000},
+   {lv:"Luxury",t:"Purebred dog",n:"Breeder price, setup, training, $5k vet buffer",c:15000}]},
+ {id:"future",em:"✨",name:"Future me",yrs:5,blurb:"No specific goal yet? Build a pot for whatever life brings: a home, a wedding, a career break or an opportunity. When a real goal shows up, the money is already there.",tiers:[
+   {lv:"Starter",t:"Future me fund",n:"A head start on the next big thing",c:20000},
+   {lv:"Solid",t:"Future me fund",n:"Enough for most big life moves",c:50000},
+   {lv:"Big",t:"Future me fund",n:"Freedom to say yes to big moves",c:100000}]},
+ {id:"retire",em:"🌴",name:"Retire",yrs:null,blurb:"The monthly income you'd want in retirement, in today's dollars, for 25 years. Enter what you expect from CPF LIFE and the plan covers only the gap.",retire:true,tiers:[
+   {lv:"Budget",t:"Simple retirement",n:"$2,000 a month",mo:2000},
+   {lv:"Comfort",t:"Comfortable retirement",n:"$3,500 a month",mo:3500},
+   {lv:"Luxury",t:"Luxe retirement",n:"$6,000 a month",mo:6000}]}
+];
+CATS.forEach(function(c){c.tiers.forEach(function(t){if(t.mo)t.c=t.mo*12*25})});
+var CAT=function(id){return CATS.filter(function(c){return c.id===id})[0]};
+
+var st=store.get("goals3")||{};
+var S={cat:"home",rate:0.06,goals:st.goals||[]};
+var I={name:$("#i-name"),age:$("#i-age"),pay:$("#i-pay"),sav:$("#i-sav"),live:$("#i-live"),ins:$("#i-ins"),cs:$("#i-cs"),ci:$("#i-ci"),oa:$("#i-oa")};
+if(st.inputs){Object.keys(I).forEach(function(k){if(st.inputs[k]!=null)I[k].value=st.inputs[k]})}
+if(!S.goals.length&&!BLANK){S.goals=[
+  {id:"reno-0",cat:"reno",tier:0,c:60000,yrs:5},
+  {id:"retire-1",cat:"retire",tier:1,c:3500*12*25,mo:3500,cpf:0,yrs:37}]}
+function save(){var inp={},p2={};Object.keys(I).forEach(function(k){inp[k]=I[k].value});if(typeof P2!=="undefined")Object.keys(P2).forEach(function(k){p2[k]=P2[k].value});store.set("goals3",{goals:S.goals,inputs:inp,p2:p2,mode:S.mode,share:S.share})}
+
+function age(){return Math.max(16,Math.min(80,num(I.age)||30))}
+var P2={name:$("#p-name"),age:$("#p-age"),pay:$("#p-pay"),sav:$("#p-sav"),ins:$("#p-ins"),oa:$("#p-oa"),start:$("#p-start")};
+S.mode=(st.mode)||"solo";S.share=st.share||"income";
+if(st.p2)Object.keys(P2).forEach(function(k){if(st.p2[k]!=null)P2[k].value=st.p2[k]});
+function couple(){return S.mode==="couple"}
+function age2(){return Math.max(16,Math.min(80,num(P2.age)||30))}
+function T(k){return num(I[k])+(couple()&&P2[k]?num(P2[k]):0)}
+function nm1(){return I.name.value.trim()||"You"}
+function nm2(){return P2.name.value.trim()||"Your partner"}
+function retireYrs(){return Math.max(1,65-age())}
+
+/* ---------- step 2 UI ---------- */
+function renderCats(){
+  $("#cats").innerHTML=CATS.map(function(c){var n=S.goals.filter(function(g){return g.cat===c.id}).length;
+    return '<button class="cat'+(c.id===S.cat?" on":"")+'" data-c="'+c.id+'"><span class="em">'+c.em+'</span>'+c.name+(n?'<span class="n">'+n+'</span>':'')+'</button>'}).join("");
+  var c=CAT(S.cat);$("#catblurb").textContent=c.blurb;
+  $("#tiers").innerHTML=c.tiers.map(function(t,i){var on=S.goals.some(function(g){return g.id===c.id+"-"+i});
+    return '<button class="tier'+(on?" on":"")+'" data-i="'+i+'"><span class="chk">'+(on?"✓":"")+'</span><h4>'+t.t+'</h4><div class="note">'+t.n+'</div><div class="price">'+fmt(t.c)+'</div>'+(t.mo?'<div class="note" style="min-height:0">nest egg in today\'s $</div>':'')+'</button>'}).join("");
+}
+$("#cats").addEventListener("click",function(e){var b=e.target.closest(".cat");if(!b)return;S.cat=b.dataset.c;renderCats()});
+$("#tiers").addEventListener("click",function(e){var b=e.target.closest(".tier");if(!b)return;
+  var c=CAT(S.cat),i=+b.dataset.i,id=c.id+"-"+i,ix=-1;
+  S.goals.forEach(function(g,k){if(g.id===id)ix=k});
+  if(ix>=0)S.goals.splice(ix,1);
+  else{var t=c.tiers[i];S.goals.push({id:id,cat:c.id,tier:i,c:t.c,mo:t.mo||0,cpf:0,yrs:c.retire?retireYrs():c.yrs})}
+  update()});
+
+function goalTitle(g){return CAT(g.cat).tiers[g.tier].t}
+function goalCost(g){var c=CAT(g.cat);if(c.retire)return Math.max(0,(g.mo-(g.cpf||0)))*12*25;return g.c}
+
+function renderMyGoals(){
+  var box=$("#mygoals");
+  if(!S.goals.length){box.innerHTML='<div class="empty">No goals yet. Pick one above.</div>';return}
+  var sorted=S.goals.slice().sort(function(a,b){return a.yrs-b.yrs});
+  box.innerHTML=sorted.map(function(g){var c=CAT(g.cat);
+    var edit=c.retire
+      ?'<label class="mini" title="Monthly income wanted" style="width:112px"><span>$/mo</span><input data-k="mo" data-id="'+g.id+'" inputmode="numeric" value="'+g.mo+'"></label><label class="mini" title="Expected CPF LIFE payout a month" style="width:132px"><span style="white-space:nowrap;font-size:12px">CPF LIFE</span><input data-k="cpf" data-id="'+g.id+'" inputmode="numeric" value="'+(g.cpf||0)+'"></label>'
+      :'<label class="mini" title="Cost in today\'s dollars"><span>$</span><input data-k="c" data-id="'+g.id+'" inputmode="numeric" value="'+g.c+'"></label>';
+    var chips=c.retire?'<div class="oa-line">'+(g.cpf?'Your plan covers only the gap above your expected CPF LIFE payout of '+fmt(g.cpf)+' a month.':'<b style="color:var(--warn)">CPF LIFE is set to $0</b>, so the plan pays for all of retirement from savings.')+' Not sure what to enter? Pick an estimate (a month from 65, roughly today\'s dollars):</div><div class="chips">'+[["Basic",950],["Full",1780],["Enhanced",3440]].map(function(x){return '<button class="chip'+(g.cpf===x[1]?" on":"")+'" data-cpf="'+x[1]+'" data-id="'+g.id+'">'+x[0]+' ≈ '+fmt(x[1])+'</button>'}).join("")+'</div>':c.id==="future"?'':couple()?(c.id==="home"?'<div class="chips"><button class="chip'+(g.noOA?"":" on")+'" data-t="noOA" data-id="'+g.id+'">'+(g.noOA?"":"✓ ")+'Use our CPF OA</button></div>':''):'<div class="chips"><button class="chip'+(g.split?" on":"")+'" data-t="split" data-id="'+g.id+'">'+(g.split?"✓ ":"")+'Split 50/50 with partner</button>'+
+      (c.id==="home"?'<button class="chip'+(g.noOA?"":" on")+'" data-t="noOA" data-id="'+g.id+'">'+(g.noOA?"":"✓ ")+'Use my CPF OA</button>':'')+'</div>';
+    return '<div class="grow"><span class="em">'+c.em+'</span><div class="t"><b>'+esc(goalTitle(g))+'</b><small>'+c.name+' · '+fmt(goalCost(g))+' today'+(c.retire?' (25 yrs of income)':'')+(g.split&&!couple()?' · your half '+fmt(goalCost(g)/2):'')+'</small></div>'+edit+
+    '<div class="yrs"><button data-d="-1" data-id="'+g.id+'" aria-label="Sooner">−</button><div class="v"><b>in '+g.yrs+' yr'+(g.yrs>1?"s":"")+'</b>'+(YEAR+g.yrs)+'</div><button data-d="1" data-id="'+g.id+'" aria-label="Later">+</button></div>'+
+    '<button class="x" data-rm="'+g.id+'" aria-label="Remove">✕</button>'+chips+'</div>'}).join("");
+}
+function gById(id){return S.goals.filter(function(g){return g.id===id})[0]}
+$("#mygoals").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+  if(b.dataset.rm){S.goals=S.goals.filter(function(g){return g.id!==b.dataset.rm});update();return}
+  if(b.dataset.t){var gg=gById(b.dataset.id);gg[b.dataset.t]=!gg[b.dataset.t];update();return}
+  if(b.dataset.cpf){var gc=gById(b.dataset.id);gc.cpf=+b.dataset.cpf;update();return}
+  if(b.dataset.d){var g=gById(b.dataset.id);g.yrs=Math.max(1,Math.min(50,g.yrs+(+b.dataset.d)));update()}});
+$("#mygoals").addEventListener("change",function(e){var el=e.target;if(!el.dataset.k)return;var g=gById(el.dataset.id);g[el.dataset.k]=num(el);update()});
+
+/* ---------- maths ---------- */
+function bucket(y){return y<3?{k:"s",r:0.02,lab:"Short-term goals",note:"under 3 years, kept in savings or T-bills at about 2% a year"}
+  :y<10?{k:"m",r:0.035,lab:"Mid-term goals",note:"3 to 9 years, in a low-risk mix at about 3.5% a year"}
+  :{k:"l",r:S.rate,lab:"Long-term goals",note:"10+ years, invested at "+pct(S.rate)+" a year"}}
+/* CPF: 2026 rates, 37% total contribution for age 55 and below, OW ceiling $8,000, OA share by age, OA interest 2.5% */
+var OA_INT=0.025,OW_CEIL=8000;
+/* 2026 CPF rates (Citizens & PRs from 3rd year, wages above $750): [total, employee] by age; OA share of contribution */
+function cpfRates(a){return a<=55?[0.37,0.20]:a<=60?[0.34,0.18]:a<=65?[0.25,0.125]:a<=70?[0.165,0.075]:[0.125,0.05]}
+function oaRatio(a){return a<=35?0.6217:a<=45?0.5677:a<=50?0.5136:a<=55?0.4055:a<=60?0.353:a<=65?0.14:a<=70?0.0607:0.08}
+function empCPF(gross,a){if(gross<=500)return 0;var r=cpfRates(a)[1];if(gross<=750)return Math.min(r*gross,0.6*(gross-500)*(r/0.2));return r*Math.min(gross,OW_CEIL)}
+function takeHome(gross,a,no){return no?gross:gross-empCPF(gross,a)}
+function thA(){return takeHome(num(I.pay),age(),$("#i-nocpf").checked)}
+function thB(){return couple()?takeHome(num(P2.pay),age2(),$("#p-nocpf").checked):0}
+function oaMonthly(a,gross){return gross<=750?0:Math.min(gross,OW_CEIL)*cpfRates(a)[0]*oaRatio(a)}
+function projectOA(yrs){return projOne(num(I.oa),age(),$("#i-nocpf").checked?0:num(I.pay),yrs)+(couple()?projOne(num(P2.oa),age2(),$("#p-nocpf").checked?0:num(P2.pay),yrs):0)}
+function projOne(oa,a0,gross,yrs){var bal=oa,g=gross;
+  for(var m=0;m<yrs*12;m++){bal=bal*(1+OA_INT/12)+oaMonthly(a0+m/12,g)}return bal}
+function estimateOA(start,who){var a=who?age2():age(),g=$(who?"#p-nocpf":"#i-nocpf").checked?0:num(who?P2.pay:I.pay),bal=0;
+  for(var y=Math.max(16,start);y<a;y++){var gy=g/Math.pow(1.03,a-y);for(var k=0;k<12;k++)bal=bal*(1+OA_INT/12)+oaMonthly(y,gy)}return bal}
+function pmt(fv,r,yrs){var m=r/12,n=yrs*12;if(fv<=0)return 0;return m===0?fv/n:fv*m/(Math.pow(1+m,n)-1)}
+
+function compute(){
+  var pay=thA()+thB(),live=num(I.live),ins=T("ins"),sav=T("sav");
+  var ef=6*(live+ins),pool=sav,efFrom=Math.min(pool,ef);pool-=efFrom;
+  var efMonthly=(ef-efFrom)/12;
+  var oaTaken=false;
+  var rows=S.goals.slice().sort(function(a,b){return a.yrs-b.yrs}).map(function(g){
+    var b=bucket(g.yrs),share=(g.split&&!couple())?0.5:1,full=goalCost(g)*share,grown=full*Math.pow(1+INFL,g.yrs),oaUse=0,minCash=0;
+    if(g.cat==="home"&&!g.noOA&&!oaTaken){oaTaken=true;var tier=CAT("home").tiers[g.tier];
+      minCash=tier.hdb?0:grown*(0.05/0.25);oaUse=Math.max(0,Math.min(projectOA(g.yrs),grown-minCash))}
+    var then=grown-oaUse,today=then/Math.pow(1+INFL,g.yrs);
+    var pv=then/Math.pow(1+b.r,g.yrs),alloc=Math.min(pool,pv);pool-=alloc;
+    var need=then-alloc*Math.pow(1+b.r,g.yrs),m=pmt(need,b.r,g.yrs);
+    return {g:g,b:b,share:share,full:full,grown:grown,oaUse:oaUse,minCash:minCash,today:today,then:then,alloc:alloc,fromPct:then>0?alloc*Math.pow(1+b.r,g.yrs)/then:0,m:m}});
+  var sm=efMonthly,lm=0;rows.forEach(function(r){if(r.b.k==="l")lm+=r.m;else sm+=r.m});
+  var need=sm+lm,avail=pay-live-ins;
+  var saveA=Math.max(0,Math.min(sm,avail)),invA=Math.max(0,Math.min(lm,avail-saveA));
+  return {pay:pay,live:live,ins:ins,sav:sav,ef:ef,efFrom:efFrom,efMonthly:efMonthly,rows:rows,sm:sm,lm:lm,need:need,avail:avail,saveA:saveA,invA:invA,spare:pool,
+    cs:num(I.cs),ci:num(I.ci)};
+}
+
+/* ---------- step 3 render ---------- */
+function renderTH(){
+  var line=function(id,gross,a,no){var e=no?0:empCPF(gross,a);$(id).textContent=gross>0?(no?"Take-home "+fmt(gross)+" (no CPF)":"Take-home ≈ "+fmt(gross-e)+" after "+fmt(e)+" employee CPF"):""};
+  line("#th-1",num(I.pay),age(),$("#i-nocpf").checked);line("#th-2",num(P2.pay),age2(),$("#p-nocpf").checked)}
+function renderPlan(){
+  renderTH();
+  var R=compute(),name=I.name.value.trim();
+  var free=R.avail;
+  var used=R.live+R.ins+R.cs+R.ci,over=used-R.pay;
+  $("#free-line").className="callout"+(free<=0||over>0.5?" warn":"");
+  $("#free-line").innerHTML=free<=0
+    ?'Your living costs and insurance already use up your take-home pay. Let\'s look at the budget first before planning goals.'
+    :over>0.5
+    ?'<b>These don\'t add up.</b> Living costs, insurance, saving and investing come to <b>'+fmt(used)+'</b>, which is <b>'+fmt(over)+'</b> more than your take-home pay of '+fmt(R.pay)+'. Check that living costs don\'t include money you already save or invest. For now the plan uses <b>'+fmt(free)+'</b> a month ('+fmt(R.pay)+' − '+fmt(R.live)+' living − '+fmt(R.ins)+' insurance).'
+    :'Take-home '+fmt(R.pay)+' − living costs '+fmt(R.live)+' − insurance '+fmt(R.ins)+' = <b>'+fmt(free)+'</b> a month free for goals.'+(R.cs+R.ci>0?' That includes the '+fmt(R.cs+R.ci)+' you already save or invest; the plan shows the best way to use all of it.':'')+' The plan never touches your living costs.';
+  $("#prepared").textContent=name?"Prepared for "+name:"Your plan";
+  $("#headline").innerHTML=R.rows.length||R.efMonthly
+    ?'Put aside <span class="amt">'+fmt(R.need)+'</span> a month to reach every goal'
+    :'Pick a goal above to see your plan';
+
+  var h='<thead><tr><th>Goal</th><th>When</th><th>Cost then</th><th class="hide-s">Grows at</th><th class="hide-s">Set aside today</th><th>A month</th></tr></thead><tbody>';
+  h+='<tr class="band"><td colspan="6">Safety net first<small>6 months of living costs and insurance</small></td></tr>';
+  h+='<tr><td><div class="gname"><span class="em">🛟</span><div><b>Emergency fund</b><small>'+fmt(R.ef)+' target</small></div></div></td><td>'+(R.efMonthly>0?"1 yr":"Now")+'</td><td>'+fmt(R.ef)+'</td><td class="hide-s">-</td><td class="hide-s">'+fmt(R.efFrom)+'</td><td class="m">'+(R.efMonthly>0?fmt(R.efMonthly):'<span class="covered">Covered ✓</span>')+'</td></tr>';
+  ["s","m","l"].forEach(function(k){var rs=R.rows.filter(function(r){return r.b.k===k});if(!rs.length)return;
+    h+='<tr class="band"><td colspan="6">'+rs[0].b.lab+'<small>'+rs[0].b.note+'</small></td></tr>';
+    rs.forEach(function(r){var c=CAT(r.g.cat);
+      h+='<tr><td><div class="gname"><span class="em">'+c.em+'</span><div><b>'+esc(goalTitle(r.g))+'</b><small>'+subLine(r)+'</small></div></div></td><td>'+(YEAR+r.g.yrs)+'<small>'+r.g.yrs+' yr'+(r.g.yrs>1?"s":"")+'</small></td><td>'+fmt(r.then)+'</td><td class="hide-s">'+pct(r.b.r,1).replace(".0%","%")+'</td><td class="hide-s">'+(r.alloc>0?fmt(r.alloc)+'<small>grows to '+fmt(r.alloc*Math.pow(1+r.b.r,r.g.yrs))+(r.fromPct>=0.995?'':' ('+pct(r.fromPct)+')')+'</small>':"-")+'</td><td class="m">'+(r.m>0.5?fmt(r.m):'<span class="covered">Covered ✓</span>')+'</td></tr>'+howRow(r)})});
+  h+='<tr class="tot"><td colspan="5">Total a month</td><td class="m">'+fmt(R.need)+'</td></tr></tbody>';
+  $("#plan").innerHTML=h;
+  $("#plan-foot").innerHTML='Prices rise '+pct(INFL,1)+' a year for inflation. Your '+fmt(R.sav)+' in savings fills the emergency fund first, then the soonest goals. <b>Set aside today</b> is the part of your savings earmarked for each goal; it grows at that goal\'s rate until you need it, so it only works if that money is actually saved or invested that way, not left in a 0.05% account.'+(R.spare>1?' You have <b>'+fmt(R.spare)+'</b> of savings left over, which could go towards long-term goals.':'')+(R.efMonthly>0?' The emergency fund top-up only runs for a year, so that money frees up after.':'');
+  renderTimeline(R);renderBudget(R);save();
+}
+
+function howRow(r){
+  var n=r.g.yrs,months=n*12,aFV=r.alloc*Math.pow(1+r.b.r,n),putIn=r.m>0.5?r.m*months:0,mFV=r.m>0.5?Math.max(0,r.then-aFV):0,oa=r.oaUse||0,total=r.then+oa,c=CAT(r.g.cat),T2=Math.max(total,1);
+  var who=couple()?"you two":"you",when=(YEAR+n);
+  var lines=[],seg=[];
+  if(r.alloc>0){lines.push('<div class="hw"><i style="background:var(--brand)"></i><div><b>1. Savings '+who+' already have</b><small>'+fmt(r.alloc)+' of your current savings, kept for this goal, grows to</small></div><b class="v">'+fmt(aFV)+'</b></div>');seg.push([aFV,"var(--brand)"])}
+  if(putIn>0){lines.push('<div class="hw"><i style="background:var(--accent)"></i><div><b>'+(lines.length+1)+'. New savings each month</b><small>'+fmt(r.m)+' a month × '+months+' months = '+fmt(putIn)+' put in, grows to</small></div><b class="v">'+fmt(mFV)+'</b></div>');seg.push([mFV,"var(--accent)"])}
+  if(oa>0){lines.push('<div class="hw"><i style="background:var(--good)"></i><div><b>'+(lines.length+1)+'. CPF OA</b><small>'+(couple()?"both of your OAs":"your OA")+' by '+when+', including future contributions</small></div><b class="v">'+fmt(oa)+'</b></div>');seg.push([oa,"var(--good)"])}
+  if(!lines.length)return '';
+  var what=c.id==="home"?'25% down payment on a home worth about '+fmt(total/0.25)+' by then'+(r.share===0.5?' (your half)':''):c.retire?'Nest egg needed at retirement':'What '+goalTitle(r.g).toLowerCase()+' will cost then';
+  return '<tr class="how"><td colspan="6"><details><summary>How this goal adds up</summary><div class="hwbox">'+
+    '<div class="incbar" style="height:14px;margin:4px 0 12px">'+seg.map(function(x){return '<i style="width:'+(x[0]/T2*100)+'%;background:'+x[1]+'"></i>'}).join("")+'</div>'+
+    lines.join("")+'<div class="hw tot"><div><b>= Total in '+when+'</b><small>'+what+'</small></div><b class="v">'+fmt(total)+'</b></div></div></details></td></tr>'}
+function subLine(r){var t=fmt(r.full)+' today'+(r.share===0.5?' (your half)':'');
+  if(r.oaUse>0)t+=' · CPF OA covers '+fmt(r.oaUse)+', cash '+fmt(r.then);
+  else if(r.g.cat==="home"&&!r.g.noOA)t+=' · no CPF OA counted';
+  return t}
+function renderTimeline(R){
+  var svg=$("#timeline"),gs=R.rows;
+  if(!gs.length){svg.innerHTML='<text x="380" y="80" text-anchor="middle" fill="var(--muted)" font-size="15">Your goals will appear here</text>';return}
+  var max=Math.max.apply(null,gs.map(function(r){return r.g.yrs}).concat([5])),x0=40,x1=720,y=78;
+  var X=function(yr){return x0+(x1-x0)*yr/max};
+  var o='<line x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'" stroke="var(--line)" stroke-width="4" stroke-linecap="round"/>';
+  o+='<circle cx="'+x0+'" cy="'+y+'" r="7" fill="var(--brand)"/><text x="'+x0+'" y="'+(y+30)+'" text-anchor="middle" font-size="13" fill="var(--muted)">Now</text><text x="'+x0+'" y="'+(y+46)+'" text-anchor="middle" font-size="12" fill="var(--muted)">age '+age()+'</text>';
+  gs.forEach(function(r,i){var cx=X(r.g.yrs),up=i%2===0,col=r.b.k==="l"?"var(--brand)":r.b.k==="m"?"var(--accent)":"var(--c1)";
+    var ty=up?y-30:y+34,anchor=cx>660?"end":cx<90?"start":"middle";
+    o+='<line x1="'+cx+'" y1="'+y+'" x2="'+cx+'" y2="'+(up?y-18:y+18)+'" stroke="'+col+'" stroke-width="2"/>';
+    o+='<circle cx="'+cx+'" cy="'+y+'" r="9" fill="'+col+'" stroke="var(--soft)" stroke-width="3"/>';
+    o+='<text x="'+cx+'" y="'+ty+'" text-anchor="'+anchor+'" font-size="18">'+CAT(r.g.cat).em+'</text>';
+    o+='<text x="'+cx+'" y="'+(up?ty-22:ty+18)+'" text-anchor="'+anchor+'" font-size="12" font-weight="700" fill="var(--ink)">'+(YEAR+r.g.yrs)+' · age '+(age()+r.g.yrs)+'</text>'});
+  svg.innerHTML=o;
+}
+
+function arc(cx,cy,r,a0,a1){var p=function(a){return [cx+r*Math.cos(a),cy+r*Math.sin(a)]},s=p(a0),e=p(a1),l=a1-a0>Math.PI?1:0;
+  return "M"+s[0]+" "+s[1]+" A"+r+" "+r+" 0 "+l+" 1 "+e[0]+" "+e[1]}
+function renderBudget(R){
+  var pay=Math.max(R.pay,1),spare=Math.max(0,R.avail-R.saveA-R.invA);
+  var segs=[["Living costs",R.live,"var(--c1)"],["Insurance · 15% max",R.ins,"var(--c2)"],["Goals: saving",R.saveA,"var(--c3)"],["Goals: investing",R.invA,"var(--c4)"],["Still free",spare,"var(--c5)"]];
+  var tot=segs.reduce(function(a,s){return a+s[1]},0)||1,a=-Math.PI/2,o="";
+  segs.forEach(function(s){if(s[1]<=0)return;var da=2*Math.PI*s[1]/tot;if(da>=2*Math.PI-1e-6)da=2*Math.PI-1e-4;
+    o+='<path d="'+arc(100,100,78,a,a+da)+'" fill="none" stroke="'+s[2]+'" stroke-width="30"/>';a+=da});
+  o+='<text x="100" y="98" text-anchor="middle" font-size="24" font-weight="800" fill="var(--ink)">'+fmt(R.pay)+'</text><text x="100" y="120" text-anchor="middle" font-size="13" fill="var(--muted)">take-home</text>';
+  $("#donut").innerHTML=o;
+  $("#legend").innerHTML=segs.map(function(s){return '<div><i style="background:'+s[2]+'"></i><span>'+s[0]+'<small>'+fmt(s[1])+'</small></span><span class="p">'+pct(s[1]/pay)+'</span></div>'}).join("");
+
+  var gap=R.need-R.avail,insP=R.ins/pay,invP=R.invA/pay,cls,icon,head,body;
+  if(R.avail<=0){cls="bad";icon="⛔";head="Budget first";body="Living costs and insurance are more than your take-home pay."}
+  else if(gap>0.5){cls=gap>R.avail*0.5?"bad":"warn";icon="⚠️";head="Needs work";body="About "+fmt(gap)+" a month short of fully funding every goal."}
+  else{cls="good";icon="✅";head="On track";body=(couple()?"Your combined pay":"Your pay")+" covers every goal, with "+fmt(-gap)+" a month to spare."}
+  var insLine=function(who,ins,pay){var r=ins/Math.max(pay,1);return '<div>'+(r<=0.15?"✓":"✗")+' '+who+' insurance is '+pct(r)+' of take-home '+(r<=0.15?"(within the 15% guide)":"(above the 15% guide, worth a review)")+'</div>'};
+  var chk='<div class="checks">'+(couple()?insLine(esc(nm1())+"'s",num(I.ins),thA())+insLine(esc(nm2())+"'s",num(P2.ins),thB()):insLine("Your",R.ins,R.pay))+
+    '<div>'+(invP>=0.10?"✓":"✗")+' Investing '+pct(invP)+' of take-home '+(invP>=0.10?"(meets the 10% guide)":"(the guide suggests at least 10%)")+'</div>'+
+    '<div>'+(R.efMonthly<=0?"✓ Emergency fund fully covered":"✗ Emergency fund needs "+fmt(R.ef-R.efFrom)+" more")+'</div></div>';
+  $("#status").innerHTML='<div class="status '+cls+'"><span class="ic">'+icon+'</span><div><b class="h">'+head+'</b>'+body+'</div></div>'+chk;
+
+  var t='';
+  if(!R.rows.length&&R.efMonthly<=0){t='<p>Add a goal above and your action plan appears here.</p>'}
+  else{
+    var cur=R.cs+R.ci,planT=R.saveA+R.invA;
+    if(cur>R.avail+0.5){
+      t+='<p><b>What to do now:</b> Your current saving and investing ('+fmt(cur)+') is more than the '+fmt(R.avail)+' left after living costs and insurance, so please check the numbers in step 1. Based on what\'s free, save <b>'+fmt(R.saveA)+'</b> a month for goals within 10 years'+(R.lm>0?' and invest <b>'+fmt(R.invA)+'</b> for goals 10+ years away':'')+'.</p>';
+    } else if(Math.abs(cur-planT)<=50&&cur>0){
+      var mv=R.cs-R.saveA;
+      t+='<p><b>What to do now:</b> You already put aside <b>'+fmt(cur)+'</b> a month, right about what your goals need ('+fmt(planT)+'). '+(Math.abs(mv)>50?'Just adjust the split: save <b>'+fmt(R.saveA)+'</b> for goals within 10 years and invest <b>'+fmt(R.invA)+'</b> for goals 10+ years away, which means moving about '+fmt(Math.abs(mv))+' a month '+(mv>0?'from saving to investing.':'from investing to saving.'):'Keep going as you are.')+'</p>';
+    } else if(cur>planT+0.5){
+      var extra=cur-planT;
+      t+='<p><b>What to do now:</b> You already put aside <b>'+fmt(cur)+'</b> a month ('+fmt(R.cs)+' saving, '+fmt(R.ci)+' investing). Your goals need <b>'+fmt(planT)+'</b>: '+fmt(R.saveA)+' saved for goals within 10 years'+(R.lm>0?' and '+fmt(R.invA)+' invested for goals 10+ years away':'')+'.</p>'+
+        '<p><b>Keep putting aside the full '+fmt(cur)+'.</b> '+(R.saveA<R.cs-0.5?'Your nearer goals need only '+fmt(R.saveA)+' a month in savings, less than the '+fmt(R.cs)+' you save now, so some of it can move to investing. That doesn\'t mean stop saving: ':'')+'the extra '+fmt(extra)+' a month can build a bigger buffer, fund a "Future me" goal, or be invested for the long term.</p>';
+    } else {
+      t+='<p><b>What to do now:</b> '+(cur>0?'Increase what you put aside from '+fmt(cur)+' to <b>'+fmt(planT)+'</b> a month: s':'S')+'ave <b>'+fmt(R.saveA)+'</b> (now '+fmt(R.cs)+') for goals within 10 years'+(R.lm>0?', and invest <b>'+fmt(R.invA)+'</b> (now '+fmt(R.ci)+') for goals 10+ years away':'')+(gap>0.5?'. That\'s the most your pay allows today.':'.')+'</p>';
+    }
+    if(gap>0.5){var big=R.rows.slice().sort(function(a,b){return b.m-a.m})[0];
+      if(big){var b2=bucket(big.g.yrs+5),then2=big.today*Math.pow(1+INFL,big.g.yrs+5),m2=pmt(then2-big.alloc*Math.pow(1+b2.r,big.g.yrs+5),b2.r,big.g.yrs+5);
+        t+='<p><b>Biggest lever:</b> moving <b>'+esc(goalTitle(big.g))+'</b> 5 years later ('+(YEAR+big.g.yrs+5)+') cuts its monthly amount from '+fmt(big.m)+' to '+fmt(m2)+'. Picking a simpler style or growing your money faster also helps.</p>'}}
+  }
+  $("#todo").innerHTML=t;
+  renderShare(R);
+}
+function renderShare(R){if(!couple())return;
+  var p1=thA(),p2=thB(),tot=Math.max(p1+p2,1),f1=S.share==="income"?p1/tot:0.5,f2=1-f1,goals=R.saveA+R.invA;
+  var person=function(nm,pay,ins,f){var lv=R.live*f,gl=goals*f,left=pay-ins-lv-gl;
+    return '<div class="person"><h4>'+esc(nm)+' <small style="font-weight:500;color:var(--muted)">· '+pct(f)+' share</small></h4>'+
+      '<div class="row"><span>Take-home</span><span>'+fmt(pay)+'</span></div>'+
+      '<div class="row"><span>Own insurance</span><span>−'+fmt(ins)+'</span></div>'+
+      '<div class="row"><span>Share of living costs</span><span>−'+fmt(lv)+'</span></div>'+
+      '<div class="row"><span>Share of goals</span><span>−'+fmt(gl)+'</span></div>'+
+      '<div class="row"><span>Left for yourself</span><span style="color:'+(left<0?"var(--bad)":"var(--good)")+'">'+fmt(left)+' ('+pct(left/Math.max(pay,1))+')</span></div></div>'};
+  $("#share-out").innerHTML='<div class="sharegrid">'+person(nm1(),p1,num(I.ins),f1)+person(nm2(),p2,num(P2.ins),f2)+'</div>'+
+    '<p class="foot">'+(S.share==="income"?"Splitting by income means you each keep a similar share of your own pay for yourselves.":"Splitting 50/50 is simple, but the lower earner keeps less of their pay for themselves.")+' Each of you pays your own insurance.</p>';
+}
+
+function planText(){
+  var R=compute(),n=I.name.value.trim()||"there";
+  var L=["Hi Celine! Here's my plan from the Celine's Cents Goals Planner.","",
+    couple()?"Couple: "+nm1()+" (age "+age()+", salary "+fmt(num(I.pay))+", take-home "+fmt(thA())+") and "+nm2()+" (age "+age2()+", salary "+fmt(num(P2.pay))+", take-home "+fmt(thB())+")":(I.name.value.trim()?I.name.value.trim()+" · ":"")+"Age "+age(),
+    "Salary: "+fmt(num(I.pay)+(couple()?num(P2.pay):0))+"/mo before CPF · Take-home: "+fmt(R.pay)+"/mo · Living costs: "+fmt(R.live)+" · Insurance: "+fmt(R.ins)+" · Savings: "+fmt(R.sav)+" · CPF OA: "+fmt(T("oa")),"",couple()?"Our goals:":"My goals:"];
+  if(R.efMonthly>0)L.push("- Emergency fund "+fmt(R.ef)+": "+fmt(R.efMonthly)+"/mo for 1 yr");
+  R.rows.forEach(function(r){var c=CAT(r.g.cat),cost=c.retire?fmt(r.then)+" nest egg needed ("+fmt(r.g.mo)+"/mo in today's dollars)":r.oaUse>0?fmt(r.then)+" in cash after "+fmt(r.oaUse)+" from CPF OA":fmt(r.then)+" by then";
+    L.push("- "+goalTitle(r.g)+(r.share===0.5?" (my half)":"")+" in "+(YEAR+r.g.yrs)+": "+cost+", "+(r.m>0.5?"save "+fmt(r.m)+"/mo":"covered by savings"))});
+  L.push("","Total needed: "+fmt(R.need)+"/mo · Free each month: "+fmt(R.avail),"","Could we chat about how to get there?");
+  return L.join("\n");
+}
+/* Telegram message is addressed to Celine; the copied version is a neutral summary */
+function neutral(t){return t.replace(/^Hi Celine! Here's my plan from the (?:Celine's Cents )?(.*?)(?: tool)?\.\n/,"My plan · Celine's Cents $1\n").replace(/\n\n[^\n]*\?$/,"")}
+function wireSend(btnId,copyId,toastId,textFn){
+  var a=$(btnId);
+  a.addEventListener("click",function(){var txt=textFn();a.href="https://t.me/celineesim?text="+encodeURIComponent(txt);
+    try{navigator.clipboard.writeText(txt).then(function(){$(toastId).textContent="Your plan is also copied. If it doesn't appear in the chat, just paste it."},function(){})}catch(e){}});
+  if(copyId)$(copyId).addEventListener("click",function(){var txt=neutral(textFn());
+    try{navigator.clipboard.writeText(txt).then(function(){$(toastId).textContent="Copied. Paste it into Telegram or WhatsApp."},function(){$(toastId).textContent="Couldn't copy here. Use the Telegram button instead."})}catch(e){$(toastId).textContent="Couldn't copy here. Use the Telegram button instead."}});
+}
+wireSend("#tg-goals","#copy-goals","#toast-goals",planText);
+
+$("#seg-rate").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.rate=+b.dataset.r;
+  $$("#seg-rate button").forEach(function(x){x.classList.toggle("on",x===b)});renderPlan()});
+Object.keys(I).forEach(function(k){I[k].addEventListener("input",function(){
+  if(k==="age"){S.goals.forEach(function(g){if(CAT(g.cat).retire)g.yrs=retireYrs()});renderMyGoals()}
+  renderPlan()})});
+function renderEst(){var v=estimateOA(num($("#i-start"))),yrs=Math.max(0,age()-num($("#i-start"))),v2=couple()?estimateOA(num(P2.start),1):0;
+  $("#oa-res").innerHTML='<b>≈ '+fmt(v)+'</b>after about '+yrs+' years of work, at '+fmt(oaMonthly(age(),$("#i-nocpf").checked?0:num(I.pay)))+' a month into your OA today'+(couple()?'<br>Your partner: <b style="display:inline;font-size:18px">≈ '+fmt(v2)+'</b>':'');return v}
+$("#oa-open").addEventListener("click",function(){var e=$("#oa-est");e.hidden=!e.hidden;if(!e.hidden)renderEst()});
+$("#i-start").addEventListener("input",renderEst);
+$("#oa-use").addEventListener("click",function(){I.oa.value=Math.round(renderEst()/100)*100;if(couple())P2.oa.value=Math.round(estimateOA(num(P2.start),1)/100)*100;$("#oa-est").hidden=true;renderPlan()});
+$("#starter-btn").addEventListener("click",function(){
+  var live=num(I.live)||2000,mo=Math.max(1500,Math.round(live/500)*500),hasR=false,hasF=false;
+  S.goals.forEach(function(g){if(g.cat==="retire")hasR=true;if(g.cat==="future")hasF=true});
+  if(!hasR){var ti=mo<=2500?0:mo<=4500?1:2;S.goals.push({id:"retire-"+ti,cat:"retire",tier:ti,c:mo*300,mo:mo,cpf:0,yrs:retireYrs()})}
+  if(!hasF)S.goals.push({id:"future-1",cat:"future",tier:1,c:50000,yrs:5});
+  S.cat="retire";update();$("#plan-card").scrollIntoView({behavior:"smooth"})});
+function setMode(m){S.mode=m;document.body.classList.toggle("is-couple",m==="couple");$$("#seg-mode button").forEach(function(x){x.classList.toggle("on",x.dataset.v===m)})}
+$("#seg-mode").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;setMode(b.dataset.v);update();if(!$("#oa-est").hidden)renderEst()});
+$("#seg-share").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.share=b.dataset.v;$$("#seg-share button").forEach(function(x){x.classList.toggle("on",x===b)});renderPlan()});
+Object.keys(P2).forEach(function(k){P2[k].addEventListener("input",function(){if(k==="start")renderEst();renderPlan()})});
+["#i-nocpf","#p-nocpf"].forEach(function(id){$(id).addEventListener("change",renderPlan)});
+setMode(S.mode);$$("#seg-share button").forEach(function(x){x.classList.toggle("on",x.dataset.v===S.share)});
+function update(){renderCats();renderMyGoals();renderPlan()}
+update();
+
+/* ================= INVESTING STARTER ================= */
+var CL=[
+ ["An emergency fund","About 6 months of expenses in a savings account you don't touch. It's what stops a surprise bill or a job loss from forcing you to sell investments at a loss."],
+ ["A hospital plan you can rely on","MediShield Life is the base. An Integrated Shield plan covers more, and is cheapest to get while you're young and healthy."],
+ ["No expensive debt","Credit card balances in Singapore charge around 27% a year. Clearing them beats any investment return."],
+ ["Core protection in place","The MAS guide suggests about 9× annual income for death and disability and 4× for critical illness, for as long as people depend on your income."],
+ ["Invest at least 10%, every month","Set up a monthly plan in a diversified fund, even $100 to start. Then step it up with every pay rise or bonus."]
+];
+var done=store.get("cl")||[false,false,false,false,false];
+function renderCL(){
+  $("#checklist").innerHTML=CL.map(function(c,i){return '<div class="cl'+(done[i]?" on":"")+'" data-i="'+i+'" role="checkbox" aria-checked="'+done[i]+'" tabindex="0"><div class="box">'+(done[i]?"✓":"")+'</div><div><h4>'+(i+1)+'. '+c[0]+'</h4><p>'+c[1]+'</p></div></div>'}).join("");
+  var n=done.filter(Boolean).length;$("#pbar").style.width=(n/5*100)+"%";
+  var firstMissing=done.indexOf(false),msg;
+  if(n===5)msg="<b>5 of 5 done.</b> You're set. Now keep going every month and review once a year.";
+  else if(firstMissing<4)msg="<b>"+n+" of 5 done.</b> Next up: <b>"+CL[firstMissing][0].toLowerCase()+"</b>. Getting this sorted now <i>is</i> the right first step.";
+  else msg="<b>4 of 5 done.</b> Your foundations are solid. You're ready to start investing.";
+  $("#ready").innerHTML=msg;store.set("cl",done)}
+$("#checklist").addEventListener("click",function(e){var r=e.target.closest(".cl");if(!r)return;var i=+r.dataset.i;done[i]=!done[i];renderCL()});
+$("#checklist").addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){var r=e.target.closest(".cl");if(r){e.preventDefault();r.click()}}});
+renderCL();
+
+var IR=0.06;
+function fvSeries(m,start,r,endAge){var mr=r/12,b=0,pts=[];for(var a=18;a<=endAge;a++){pts.push([a,b]);if(a>=endAge)break;for(var k=0;k<12;k++){if(a>=start)b=(b+m)*(1+mr);else b=b}}return pts}
+function renderWait(){
+  var m=+$("#r-amt").value,s=+$("#r-age").value;$("#o-amt").textContent=fmt(m);$("#o-age").textContent=s;$("#dca-amt").textContent=fmt(m);
+  var L=[{n:"Start at "+s,a:s,r:IR,c:"var(--brand)",w:3.5},{n:"Start at "+(s+5),a:s+5,r:IR,c:"var(--accent)",w:3},{n:"Start at "+(s+10),a:s+10,r:IR,c:"var(--c2)",w:3},{n:"Bank at 0.05%",a:s,r:0.0005,c:"var(--c1)",w:2.5,d:"5 6"}];
+  L.forEach(function(l){l.p=fvSeries(m,l.a,l.r,65);l.end=l.p[l.p.length-1][1]});
+  var put=m*12*(65-s),max=L[0].end||1;
+  $("#wait-stats").innerHTML='<div class="stat"><b>'+fmt(L[0].end)+'</b><span>at 65 if you start at '+s+'</span><small>you put in '+fmt(put)+'</small></div>'+
+    '<div class="stat alt"><b>'+fmt(L[2].end)+'</b><span>if you start at '+(s+10)+' instead</span><small>waiting 10 years costs '+fmt(L[0].end-L[2].end)+'</small></div>'+
+    '<div class="stat dim"><b>'+fmt(L[3].end)+'</b><span>left in a bank at 0.05%</span><small>barely more than you put in</small></div>';
+  var W=760,H=300,x0=56,x1=740,y0=20,y1=260,X=function(a){return x0+(x1-x0)*(a-18)/(65-18)},Y=function(v){return y1-(y1-y0)*v/max};
+  var o="";[0,0.5,1].forEach(function(f){var v=max*f;o+='<line x1="'+x0+'" x2="'+x1+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(x0-8)+'" y="'+(Y(v)+4)+'" text-anchor="end" font-size="12" fill="var(--muted)">'+fmtK(v)+'</text>'});
+  [20,30,40,50,65].forEach(function(a){o+='<text x="'+X(a)+'" y="'+(y1+22)+'" text-anchor="middle" font-size="12" fill="var(--muted)">'+a+'</text>'});
+  L.slice().reverse().forEach(function(l){o+='<path d="'+l.p.map(function(p,i){return (i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)}).join(" ")+'" fill="none" stroke="'+l.c+'" stroke-width="'+l.w+'" stroke-linejoin="round"'+(l.d?' stroke-dasharray="'+l.d+'"':'')+'/>'});
+  $("#wait-chart").innerHTML=o;
+  $("#wait-keys").innerHTML=L.map(function(l){return '<span><i style="background:'+l.c+'"></i>'+l.n+'</span>'}).join("");
+  renderDCA(m);
+}
+function renderDCA(m){
+  var P=[];for(var t=0;t<=24;t++)P.push(t<=9?1-0.4*t/9:0.6+0.4*(t-9)/15);
+  var units=0;P.forEach(function(p){units+=m/p});var put=m*P.length,val=units*P[P.length-1];
+  var lump=0;P.forEach(function(){lump=(lump+m)*(1+0.0005/12)});
+  var x0=40,x1=740,y0=20,y1=180,X=function(t){return x0+(x1-x0)*t/24},Y=function(p){return y1-(y1-y0)*(p-0.5)/0.6};
+  var o='<line x1="'+x0+'" x2="'+x1+'" y1="'+Y(1)+'" y2="'+Y(1)+'" stroke="var(--line)" stroke-dasharray="4 5"/><text x="'+x1+'" y="'+(Y(1)-6)+'" text-anchor="end" font-size="12" fill="var(--muted)">starting price</text>';
+  P.forEach(function(p,t){var h=(1/p-1)*60+8;o+='<rect x="'+(X(t)-9)+'" y="'+(y1+36-h)+'" width="18" height="'+h+'" rx="3" fill="var(--accent)" opacity=".35"/>'});
+  o+='<path d="'+P.map(function(p,t){return (t?"L":"M")+X(t)+" "+Y(p)}).join(" ")+'" fill="none" stroke="var(--brand)" stroke-width="3.5"/>';
+  o+='<circle cx="'+X(9)+'" cy="'+Y(0.6)+'" r="5" fill="var(--brand)"/><text x="'+(X(9)+12)+'" y="'+(Y(0.6)+4)+'" font-size="13" font-weight="700" fill="var(--bad)">−40%</text>';
+  o+='<text x="'+x0+'" y="'+(y1+36+16)+'" font-size="12" fill="var(--muted)">Bars: units your '+fmt(m)+' buys each month (more when prices are low)</text>';
+  $("#dca-chart").setAttribute("viewBox","0 0 760 240");$("#dca-chart").innerHTML=o;
+  $("#dca-stats").innerHTML='<div class="stat dim"><b>'+fmt(put)+'</b><span>you put in over 25 months</span><small>price ends exactly where it started</small></div>'+
+   '<div class="stat"><b>'+fmt(val)+'</b><span>what it\'s worth at the end</span><small>'+pct(val/put-1)+' up, from buying more units cheap</small></div>'+
+   '<div class="stat alt"><b>'+fmt(lump)+'</b><span>if you\'d kept it in the bank at 0.05%</span><small>waiting for the "right" time, earning '+fmt(lump-put)+' in interest</small></div>';
+  $("#dca-tldr").innerHTML="Even though the price only got back to where it started, investing every month turned "+fmt(put)+" into "+fmt(val)+". <b>Staying in through the dip is what made the money.</b> This is a simplified example, not a forecast.";
+}
+$("#r-amt").addEventListener("input",renderWait);$("#r-age").addEventListener("input",renderWait);
+$("#seg-rate2").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;IR=+b.dataset.r;
+  $$("#seg-rate2 button").forEach(function(x){x.classList.toggle("on",x===b)});renderWait()});
+$("#r-age").value=Math.min(55,Math.max(18,age()));
+renderWait();
+
+
+/* growth calculator */
+var GR=[[0.0005,"Bank savings","#9AA39E"],[0.025,"FD / T-bills","#CFA77F"],[0.04,"Cautious","#D9703F"],[0.06,"Moderate","#3E7C64"],[0.08,"Growth","#1F4D3F"]];
+function grFV(m,l,r,months){var mr=r/12,b=l;for(var k=0;k<months;k++)b=(b+m)*(1+mr);return b}
+function renderGrow(){
+  var m=num($("#gr-m")),l=num($("#gr-l")),y=+$("#gr-y").value,put=l+m*12*y;
+  $("#gr-yo").textContent=y+" year"+(y>1?"s":"");
+  var res=GR.map(function(g){return grFV(m,l,g[0],y*12)});
+  $("#gr-cards").innerHTML=GR.map(function(g,i){var v=res[i],gain=v-put;
+    return '<div class="gc" style="--gc:'+g[2]+'"><div class="rt">'+(g[0]<0.01?"0.05%":pct(g[0],1).replace(".0%","%"))+'</div><div class="r">'+g[1]+'</div><div class="v">'+fmt(v)+'</div><small><b>+'+fmt(gain)+'</b> growth</small>'+(put>0?'<small>'+(v/put).toFixed(1)+'× your money</small>':'')+'</div>'}).join("");
+  $("#gr-put").innerHTML='You put in <b>'+fmt(put)+'</b> over '+y+' year'+(y>1?'s':'')+'. Here\'s what it could become:';
+  var x0=60,x1=740,y0=16,y1=240,max=Math.max.apply(null,res.concat([1]));
+  var X=function(t){return x0+(x1-x0)*t/y},Y=function(v){return y1-(y1-y0)*v/max};
+  var o="";[0,0.5,1].forEach(function(f){var v=max*f;o+='<line x1="'+x0+'" x2="'+x1+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(x0-8)+'" y="'+(Y(v)+4)+'" text-anchor="end" font-size="12" fill="var(--muted)">'+fmtK(v)+'</text>'});
+  var step=y<=10?1:y<=20?5:10;for(var t=0;t<=y;t+=step)o+='<text x="'+X(t)+'" y="'+(y1+22)+'" text-anchor="middle" font-size="12" fill="var(--muted)">'+(t===0?"Now":"Yr "+t)+'</text>';
+  o+='<path d="M'+X(0)+' '+Y(l)+' L'+X(y)+' '+Y(put)+'" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 5" fill="none"/>';
+  GR.slice().reverse().forEach(function(g){var d="";for(var t=0;t<=y;t++)d+=(t?"L":"M")+X(t).toFixed(1)+" "+Y(grFV(m,l,g[0],t*12)).toFixed(1)+" ";
+    o+='<path d="'+d+'" fill="none" stroke="'+g[2]+'" stroke-width="'+(g[0]===0.06?3.5:2.5)+'" stroke-linejoin="round"/>'});
+  $("#gr-chart").innerHTML=o;
+  $("#gr-keys").innerHTML=GR.map(function(g){return '<span><i style="background:'+g[2]+'"></i>'+(g[0]<0.01?"0.05%":pct(g[0],1).replace(".0%","%"))+'</span>'}).join("")+'<span><i style="background:var(--muted)"></i>What you put in</span>';
+}
+["#gr-m","#gr-l","#gr-y"].forEach(function(id){$(id).addEventListener("input",renderGrow)});
+renderGrow();
+
+var BK=[
+ ["⏳","Short term","under 3 years · emergencies, travel, wedding",["High-yield savings accounts and fixed deposits","T-bills and Singapore Savings Bonds"],"You'll need this money soon, so the priority is that it's there in full when you need it. Expect roughly 2 to 3% a year."],
+ ["🏠","Mid term","3 to 9 years · home, reno, car, baby",["A low-risk mix leaning to bonds, such as bond funds or conservative portfolios","Savings plans with capital guarantees, if you value certainty"],"Some growth to beat inflation, but limited ups and downs, because a big fall a year before you buy a home would hurt."],
+ ["🌴","Long term","10+ years · retirement, children's uni",["Diversified equity funds or ETFs, invested monthly","Investment-linked plans, if you also want protection built in","CPF top-ups for retirement, with tax relief"],"Time is your buffer. Markets will fall along the way, and 10+ years gives them room to recover."]
+];
+$("#buckets").innerHTML=BK.map(function(b,i){return '<div class="acc'+(i===0?" open":"")+'"><button><span class="em">'+b[0]+'</span><span><b>'+b[1]+'</b><small>'+b[2]+'</small></span><span class="pm">+</span></button><div class="body"><ul>'+b[3].map(function(x){return "<li>"+x+"</li>"}).join("")+'</ul><div class="why">'+b[4]+'</div></div></div>'}).join("");
+$("#buckets").addEventListener("click",function(e){var b=e.target.closest(".acc>button");if(b)b.parentNode.classList.toggle("open")});
+
+
+/* ================= RETIREMENT ================= */
+var RCL=[
+ ["Legal & legacy",[
+  ["A will","Decides who gets your assets outside CPF. Without one, the law decides, and it may not match your wishes."],
+  ["CPF nomination","CPF savings don't go through your will. Make a nomination online with Singpass so they reach the right people quickly."],
+  ["Insurance nominations","Name beneficiaries on your policies so payouts go straight to your loved ones."],
+  ["Lasting Power of Attorney (LPA)","Lets someone you trust make decisions for you if you lose mental capacity. Form 1 is free for Singapore Citizens from 1 April 2026."],
+  ["Advance Care Plan","Write down the medical care you would want, so your family doesn't have to guess in a crisis."],
+  ["A legacy folder","Policies, accounts, property papers and wishes in one place your family can find. The government's MyLegacy portal helps."]]],
+ ["Health & care",[
+  ["Hospital plan reviewed","Integrated Shield premiums rise steeply after 60. Check you can keep paying into your 80s, and how much MediSave can cover."],
+  ["Long-term care cover","CareShield Life or ElderShield pays if you can't manage daily activities. Consider a supplement for higher payouts."]]],
+ ["Money",[
+  ["Emergency fund of 6 to 12 months","Retirees have no salary to fall back on, so a bigger cash buffer helps."],
+  ["Mortgage and debts cleared","Aim to be debt-free by the time you stop work, or have a clear plan to get there."],
+  ["CPF at 55 sorted","Decide how much to keep in your Retirement Account (Full Retirement Sum $220,400 if you turn 55 in 2026) and whether to top up for higher payouts."],
+  ["CPF LIFE plan and start age chosen","Pick the Standard, Basic or Escalating plan. Each year you delay payouts past 65, up to 70, raises them by up to 7%."]]]
+];
+var rdone=store.get("rcl")||[];
+function renderRCL(){var i=0,h="";
+  RCL.forEach(function(g){h+='<div class="grp">'+g[0]+'</div>';g[1].forEach(function(c){var on=!!rdone[i];
+    h+='<div class="cl'+(on?" on":"")+'" data-i="'+i+'" role="checkbox" aria-checked="'+on+'" tabindex="0"><div class="box">'+(on?"✓":"")+'</div><div><h4>'+c[0]+'</h4><p>'+c[1]+'</p></div></div>';i++})});
+  $("#r-checklist").innerHTML=h;
+  var total=i,n=0;for(var k=0;k<total;k++)if(rdone[k])n++;
+  $("#r-pbar").style.width=(n/total*100)+"%";
+  var miss=[];i=0;RCL.forEach(function(g){g[1].forEach(function(c){if(!rdone[i])miss.push(c[0]);i++})});
+  $("#r-ready").innerHTML=n===total?"<b>All "+total+" done.</b> You're in great shape. Review once a year, or after any big life change."
+    :"<b>"+n+" of "+total+" done.</b> Still to do: "+miss.slice(0,3).join(", ")+(miss.length>3?" and "+(miss.length-3)+" more":"")+".";
+  store.set("rcl",rdone)}
+$("#r-checklist").addEventListener("click",function(e){var r=e.target.closest(".cl");if(!r)return;var i=+r.dataset.i;rdone[i]=!rdone[i];renderRCL()});
+$("#r-checklist").addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){var r=e.target.closest(".cl");if(r){e.preventDefault();r.click()}}});
+renderRCL();
+
+/* ---- step 2: spending ---- */
+var EXL={home:"Home",food:"Food & living",car:"Car & transport",ins:"Insurance",health:"Healthcare",family:"Family & gifts",fun:"Hobbies & fun",travel:"Travel",other:"Others"};
+function breakdown(){var o={tot:0,ess:0,life:0};$$(".ex").forEach(function(el){var v=num(el)/(el.dataset.y?12:1);o.tot+=v;if(el.dataset.e)o.ess+=v;else o.life+=v});return o}
+function expenses(){var B=breakdown(),need=num($("#rt-need")),sh=B.tot>0?B.ess/B.tot:0.7;return {tot:need,ess:need*sh,life:need*(1-sh)}}
+function renderExp(){var E=breakdown();
+  var tot=Math.max(E.tot,1);
+  $("#ex-bar").innerHTML='<i style="width:'+(E.ess/tot*100)+'%;background:var(--brand)"></i><i style="width:'+(E.life/tot*100)+'%;background:var(--accent)"></i>';
+  $("#ex-legend").innerHTML='<div><i style="background:var(--brand)"></i><span>Essentials<small>home, food, transport, insurance, healthcare</small></span><span class="p">'+fmt(E.ess)+'</span></div>'+
+    '<div><i style="background:var(--accent)"></i><span>Lifestyle<small>family, fun, travel, others</small></span><span class="p">'+fmt(E.life)+'</span></div>'+
+    '<div><span>Total: <b>'+fmt(E.tot)+' a month</b>, copied into your monthly spending above.</span></div>'}
+
+/* ---- step 3: five income streams ---- */
+var STREAMS=[
+ ["cpf","🏛️","CPF LIFE","Guaranteed for life. Whatever is left of what you put in goes to your family when you pass on.","Starts only at 65 (or later). The longer you live, the less is left for your family, and interest isn't passed on.",1780,true],
+ ["rent","🏢","Property rental","Steady monthly rent that tends to rise with prices over time.","Tenants, vacancies and repairs can be a headache, and it's hard to sell just a part when you need cash.",0,false],
+ ["ann","📄","Annuities","A fixed income for a set period or for life, so it can be planned around.","Less flexible: money is locked in, and fixed payouts buy less as prices rise.",0,true],
+ ["div","📈","Dividends","Can pay a higher income from shares, REITs and income funds, and the capital can still grow.","Prices and payouts go up and down, sometimes sharply, so it needs a buffer.",0,false],
+ ["int","🏦","Interest","Fixed deposits, T-bills and Singapore Savings Bonds are safe and easy to access.","Rates change and are low after inflation, so the money slowly loses buying power.",0,false]
+];
+var SDEF={cpf:1780,rent:2000,ann:500,div:500,int:300},SSHORT={cpf:"guaranteed, from 65",rent:"from property",ann:"fixed payouts",div:"from shares & REITs",int:"FD, T-bills, SSB"};
+var sst=store.get("streams")||(BLANK?{}:{cpf:1780});
+$("#streams").innerHTML=STREAMS.map(function(x){var v=sst[x[0]]||0;
+  return '<div class="tile'+(v>0?" on":"")+'" data-s="'+x[0]+'"><button type="button" class="tb"><span class="em">'+x[1]+'</span><b>'+x[2]+'</b><small>'+SSHORT[x[0]]+'</small></button><div class="inp"><span>$</span><input class="st" data-k="'+x[0]+'" inputmode="numeric" value="'+v+'"></div></div>'}).join("");
+$("#stream-pc").innerHTML=STREAMS.map(function(x){return '<div class="pcrow"><span class="em">'+x[1]+'</span><div><b>'+x[2]+'</b><div>👍 '+x[3]+'</div><div style="color:var(--muted)">👎 '+x[4]+'</div></div></div>'}).join("");
+$("#streams").addEventListener("click",function(e){var b=e.target.closest(".tb");if(!b)return;var t=b.parentNode,inp=$(".st",t),on=!t.classList.contains("on");
+  t.classList.toggle("on",on);inp.value=on?(num(inp)||SDEF[t.dataset.s]):0;if(on){try{inp.focus();inp.select()}catch(_){}}renderRetire()});
+function streams(){var o={};$$(".st").forEach(function(el){o[el.dataset.k]=el.parentNode.parentNode.classList.contains("on")?num(el):0});return o}
+
+var RS={start:65,rate:0.045};
+var DEFER70=2380/1780;
+function rseg(id,key){$(id).addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;RS[key]=+b.dataset.v;$$(id+" button").forEach(function(x){x.classList.toggle("on",x===b)});renderRetire()})}
+rseg("#r-seg-start","start");rseg("#r-seg-rate","rate");
+
+var RI={name:$("#rt-name"),need:$("#rt-need"),age:$("#rt-age"),ret:$("#rt-ret"),until:$("#rt-until"),sav:$("#rt-sav"),add:$("#rt-add")};
+var rst=store.get("ret3");if(rst){Object.keys(RI).forEach(function(k){if(rst[k]!=null)RI[k].value=rst[k]});
+  if(rst.ex)$$(".ex").forEach(function(el){if(rst.ex[el.dataset.k]!=null)el.value=rst.ex[el.dataset.k]});
+  if(rst.al)$$(".al").forEach(function(el){if(rst.al[el.dataset.k]!=null)el.value=rst.al[el.dataset.k]})}
+
+function renderStreams(){
+  var S=streams(),E=expenses(),cnt=0;
+  $$(".tile").forEach(function(el){if(S[el.dataset.s]>0)cnt++});
+  var cpfNow=S.cpf*(RS.start===70?DEFER70:1);
+  var passive=cpfNow+S.rent+S.ann+S.div+S.int,cov=passive/Math.max(E.tot,1);
+  $("#ans-count").textContent=cnt+" of 5";
+  $("#ans-cover").innerHTML='Passive income <b>'+fmt(passive)+'</b> a month, against the <b>'+fmt(E.tot)+'</b> you need: <b style="color:'+(cov>=1?"var(--good)":"var(--accent)")+'">'+pct(Math.min(cov,9.99))+' covered</b>'+(cnt<3?'. More streams make your income sturdier.':'.');
+  $("#ans-bar").style.width=Math.min(100,cov*100)+"%";
+  return {S:S,cnt:cnt,passive:passive}
+}
+
+/* ---- step 4: will it last ---- */
+function rParams(o){var a=Math.max(30,Math.min(95,num(RI.age)||55)),S=streams();
+  var p={age:a,ret:Math.max(a,num(RI.ret)||a),until:Math.max(a+1,Math.min(105,num(RI.until)||90)),spend:expenses().tot,other:S.rent+S.ann,sav:num(RI.sav),add:num(RI.add),
+    cpf:S.cpf*(RS.start===70?DEFER70:1),start:RS.start,rate:RS.rate};
+  if(o)Object.keys(o).forEach(function(k){p[k]=o[k]});return p}
+function cpfAt(p,a){return a>=p.start?p.cpf/Math.pow(1+INFL,a-p.age):0}
+function rsim(p){
+  var rr=(1+p.rate)/(1+INFL)-1,rm=Math.pow(1+rr,1/12)-1,pot=p.sav,months=Math.round((p.until-p.age)*12),pts=[[p.age,pot]],last=null,pvNeed=0,potAtRet=p.ret<=p.age?pot:null;
+  var nPre=Math.round((p.ret-p.age)*12);
+  for(var m=0;m<months;m++){var a=p.age+m/12;
+    if(a<p.ret){pot=pot*(1+rm)+p.add}
+    else{if(potAtRet===null)potAtRet=pot;
+      var draw=Math.max(0,p.spend-p.other-cpfAt(p,a));
+      pvNeed+=draw/Math.pow(1+rm,m-nPre+1);
+      pot=pot*(1+rm)-draw;if(pot<0&&last===null)last=a}
+    if((m+1)%12===0)pts.push([p.age+(m+1)/12,Math.max(0,pot)])}
+  if(potAtRet===null)potAtRet=pot;
+  var fvSav=p.sav*Math.pow(1+rm,nPre)+(nPre>0?p.add*(Math.pow(1+rm,nPre)-1)/rm:0);
+  var gap=pvNeed-fvSav,extra=gap>0&&nPre>0?gap*rm/(Math.pow(1+rm,nPre)-1):0;
+  return {pts:pts,last:last,end:pot,need:pvNeed,potAtRet:potAtRet,gap:gap,extra:extra,nPre:nPre,p:p}}
+function safeSpend(p){var lo=0,hi=60000;for(var k=0;k<40;k++){var mid=(lo+hi)/2;if(rsim(Object.assign({},p,{spend:mid})).last===null)lo=mid;else hi=mid}return lo}
+
+function renderRetire(){
+  renderExp();var SS=renderStreams();
+  var p=rParams(),R=rsim(p),retired=p.ret<=p.age;
+  var st;
+  if(R.last===null)st='<div class="status good"><span class="ic">✅</span><div><b class="h">Your money lasts past age '+p.until+'</b>with about '+fmt(R.end)+' left over in today\'s dollars, for your family or for a longer life.</div></div>';
+  else st='<div class="status '+(R.last-p.ret<10?"bad":"warn")+'"><span class="ic">⚠️</span><div><b class="h">Runs out at about age '+Math.floor(R.last)+'</b>'+(retired?'That\'s '+Math.round(p.until-R.last)+' years short of age '+p.until+'. See the ways to close the gap below.':'To last until '+p.until+', put aside about <b>'+fmt(R.extra)+'</b> more a month until you stop work, or see your biggest lever below.')+'</div></div>';
+  $("#r-status").innerHTML=st;
+  var safe=safeSpend(p),diff=safe-p.spend;
+  $("#r-permit").innerHTML='<div class="permit"><span>You can safely spend up to</span><b class="big">'+fmt(safe)+' a month</b><span>'+(diff>=50?'That\'s <b>'+fmt(diff)+' more</b> than you plan to spend, every month until '+p.until+'. Give yourself permission to enjoy it.':diff>-50?'That\'s about what you plan to spend. You\'re right on target.':'That\'s <b>'+fmt(-diff)+' less</b> than you plan to spend. Let\'s look at the gap together.')+'</span></div>';
+  var bridge=p.ret<p.start?(p.start-p.ret):0;
+  $("#r-out").innerHTML='<div class="stat"><b>'+fmt(R.potAtRet)+'</b><span>savings when you stop work at '+p.ret+'</span><small>at '+pct(p.rate,1).replace(".0%","%")+' growth</small></div>'+
+   '<div class="stat alt"><b>'+fmt(R.need)+'</b><span>needed at '+p.ret+' to last until '+p.until+'</span><small>after CPF LIFE, rent and annuities</small></div>'+
+   '<div class="stat '+(bridge?"alt":"dim")+'"><b>'+(bridge?bridge+" yr"+(bridge>1?"s":""):"None")+'</b><span>'+(bridge?'bridge before CPF LIFE starts at '+p.start:'CPF LIFE starts as you stop work')+'</span><small>'+(bridge?'your savings pay more until then':'no gap to cover')+'</small></div>';
+  // chart
+  var x0=60,x1=740,y0=16,y1=240,amin=p.age,amax=p.until,max=Math.max.apply(null,R.pts.map(function(q){return q[1]}).concat([1]));
+  var X=function(a){return x0+(x1-x0)*(a-amin)/(amax-amin)},Y=function(v){return y1-(y1-y0)*v/max};
+  var o="";[0,0.5,1].forEach(function(f){var v=max*f;o+='<line x1="'+x0+'" x2="'+x1+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(x0-8)+'" y="'+(Y(v)+4)+'" text-anchor="end" font-size="12" fill="var(--muted)">'+fmtK(v)+'</text>'});
+  var step=(amax-amin)>30?10:5;for(var a=Math.ceil(amin/step)*step;a<=amax;a+=step)o+='<text x="'+X(a)+'" y="'+(y1+22)+'" text-anchor="middle" font-size="12" fill="var(--muted)">'+a+'</text>';
+  if(p.ret>amin)o+='<line x1="'+X(p.ret)+'" x2="'+X(p.ret)+'" y1="'+y0+'" y2="'+y1+'" stroke="var(--accent)" stroke-dasharray="5 5" stroke-width="2"/>';
+  if(p.start>amin&&p.start<amax)o+='<line x1="'+X(p.start)+'" x2="'+X(p.start)+'" y1="'+y0+'" y2="'+y1+'" stroke="var(--good)" stroke-dasharray="5 5" stroke-width="2"/>';
+  var d=R.pts.map(function(q,i){return (i?"L":"M")+X(q[0]).toFixed(1)+" "+Y(q[1]).toFixed(1)}).join(" ");
+  o+='<path d="'+d+" L"+X(R.pts[R.pts.length-1][0]).toFixed(1)+" "+y1+" L"+X(amin)+" "+y1+' Z" fill="var(--brand)" opacity=".08"/>';
+  o+='<path d="'+d+'" fill="none" stroke="var(--brand)" stroke-width="3.5" stroke-linejoin="round"/>';
+  if(R.last!==null)o+='<circle cx="'+X(R.last)+'" cy="'+y1+'" r="7" fill="var(--bad)"/><text x="'+(X(R.last)+12)+'" y="'+(y1-12)+'" font-size="13" font-weight="700" fill="var(--bad)">runs out ~'+Math.floor(R.last)+'</text>';
+  $("#r-chart").innerHTML=o;
+  // buckets
+  var W=Math.max(0,p.spend-p.other-cpfAt(p,p.ret))*12,P=Math.max(0,R.potAtRet);
+  var b1=Math.min(P,2*W),b2=Math.min(P-b1,5*W),b3=P-b1-b2;
+  $("#buckets-r").innerHTML='<div class="stat"><b>'+fmt(b1)+'</b><span>🏦 <b>Bucket 1 · Cash</b></span><small>Next 2 years of withdrawals. FD, T-bills, SSB. Your "paycheck" account.</small></div>'+
+    '<div class="stat alt"><b>'+fmt(b2)+'</b><span>📜 <b>Bucket 2 · Income</b></span><small>Years 3 to 7. Bonds, income funds, annuities. Refills bucket 1.</small></div>'+
+    '<div class="stat"><b>'+fmt(b3)+'</b><span>📈 <b>Bucket 3 · Growth</b></span><small>Year 8 onwards and your legacy. Diversified investments that can ride out market falls.</small></div>';
+  // levers
+  var best=null;
+  function res(o,label){var q=rsim(rParams(o)),sc=q.last===null?-1e9:(retired?-q.last:q.extra);if(R.last!==null&&label&&(!best||sc<best.sc))best={sc:sc,label:label,q:q};
+    return q.last===null?'<b style="color:var(--good)">lasts past '+p.until+' ✓</b>':(retired?'<b>lasts to ~'+Math.floor(q.last)+'</b>':'<b>'+fmt(q.extra)+' more a month</b>')}
+  var L=[];
+  if(!retired)L.push(["Work 2 more years (stop at "+(p.ret+2)+")",res({ret:p.ret+2},"work 2 more years")]);
+  if(RS.start===65)L.push(["Start CPF LIFE at 70 instead of 65",res({start:70,cpf:streams().cpf*DEFER70},"start CPF LIFE at 70")]);
+  L.push(["Spend 10% less ("+fmt(p.spend*0.9)+" a month)",res({spend:p.spend*0.9},"spend 10% less")]);
+  L.push(["Add "+fmt(800)+" a month from outside these savings (rent, part-time work)",res({other:p.other+800},"add about $800 a month of income from outside these savings, such as rent from a property you own or part-time work")]);
+  if(streams().cpf<3440&&p.age>=55&&p.age<65){var cost=(3440-streams().cpf)*(220400/1780);
+    L.push(["Top up CPF towards the Enhanced sum (≈ "+fmt(3440)+" a month), using about "+fmt(cost)+" of your savings",cost>p.sav?'<b>needs more than your savings</b>':res({cpf:3440*(RS.start===70?DEFER70:1),sav:p.sav-cost},"top up your CPF towards the Enhanced sum")])}
+  $("#r-levers").innerHTML=(R.last===null?'<div class="lever"><span>You\'re on track. These show how much more room you\'d have.</span></div>':'')+L.map(function(x){return '<div class="lever"><span>'+x[0]+'</span>'+x[1]+'</div>'}).join("");
+  var nx;
+  if(R.last===null)nx='<p><b>Your next move:</b> '+(SS.cnt<3?'add a third income stream, so no single source has to carry your retirement.':'make sure your plan is in place: will, LPA and CPF nomination (see the checklist below).')+'</p>';
+  else if(best)nx='<p><b>Your biggest lever:</b> '+best.label+'. '+(best.q.last===null?'That alone makes your money last past '+p.until+'.':(retired?'That stretches your money to about age '+Math.floor(best.q.last)+'.':'That cuts the extra you need to '+fmt(best.q.extra)+' a month.'))+' See "Go deeper" for more options.</p>';
+  else nx='';
+  $("#r-next").innerHTML=nx;$("#r-next").style.display=nx?"":"none";
+  renderAlloc(W);renderEstate();saveRet();
+  return {R:R,safe:safe,SS:SS}
+}
+
+/* ---- step 5: allocation ---- */
+var THESIS=["Dividends & income","Growth","Index funds & ETFs","Picking my own stocks","Property","Insurance plans","Mostly cash","Not sure yet"];
+var th=store.get("thesis")||[];
+function renderThesis(){$("#thesis").innerHTML=THESIS.map(function(t,i){return '<button type="button" class="chip'+(th.indexOf(i)>=0?" on":"")+'" data-i="'+i+'">'+(th.indexOf(i)>=0?"✓ ":"")+t+'</button>'}).join("")}
+$("#thesis").addEventListener("click",function(e){var b=e.target.closest(".chip");if(!b)return;var i=+b.dataset.i,k=th.indexOf(i);if(k>=0)th.splice(k,1);else th.push(i);store.set("thesis",th);renderThesis();renderAlloc()});
+renderThesis();
+var ALL={sg:["Singapore","#1F4D3F"],us:["US","#3E7C64"],ot:["Other markets","#8DB59F"],bd:["Bonds","#D9703F"],cs:["Cash & FD","#E9B79A"],ox:["Others","#9AA39E"]};
+var lastW=0;
+function alloc(){var o={t:0};$$(".al").forEach(function(el){o[el.dataset.k]=num(el);o.t+=num(el)});return o}
+function renderAlloc(W){if(W!=null)lastW=W;var A=alloc(),t=Math.max(A.t,1);
+  $("#al-total").textContent=fmt(A.t)+" in total";
+  $("#al-bar").innerHTML=Object.keys(ALL).map(function(k){return A[k]>0?'<i style="width:'+(A[k]/t*100)+'%;background:'+ALL[k][1]+'"></i>':''}).join("");
+  $("#al-legend").innerHTML=Object.keys(ALL).filter(function(k){return A[k]>0}).map(function(k){return '<div><i style="background:'+ALL[k][1]+'"></i><span>'+ALL[k][0]+'<small>'+fmt(A[k])+'</small></span><span class="p">'+pct(A[k]/t)+'</span></div>'}).join("");
+  var eq=A.sg+A.us+A.ot,safeA=A.bd+A.cs,N=[];
+  if(A.t<=0){$("#al-notes").innerHTML='<div class="lever"><span>Fill in where your money is today to see what stands out.</span></div>';return}
+  if(A.cs/t>0.5)N.push(["🏦","<b>"+pct(A.cs/t)+" is in cash and deposits.</b> It feels safe, but after inflation it barely grows. This is the \"FD and slowly spend it\" trap that makes retirees nervous about spending."]);
+  if(eq>0&&A.sg/eq>0.6)N.push(["🇸🇬","<b>"+pct(A.sg/eq)+" of your shares are in Singapore.</b> Familiar and income-rich, but it ties your future to one small market. Spreading across regions lowers that risk."]);
+  if(lastW>0){var yrs=safeA/lastW;N.push([yrs>=2?"✅":"⚠️","<b>Your safe assets cover about "+(yrs>=10?"10+":yrs.toFixed(1))+" years of withdrawals.</b> "+(yrs<2?"Less than 2 years means a market fall early in retirement could force you to sell at a loss.":yrs>12?"That's a lot sitting still. Part of it could be working harder for you.":"That's a comfortable buffer against market falls.")])}
+  if(t>0&&eq/t>0.8&&num(RI.age)>=55)N.push(["📉","<b>"+pct(eq/t)+" is in shares.</b> Great for growth, but a big fall just as you start withdrawing hurts the most. Keep the next few years of spending safe."]);
+  if(A.bd===0&&A.t>100000)N.push(["📜","<b>No bonds or income funds yet.</b> They sit between cash and shares, paying steadier income to refill your paycheck account."]);
+  if(!N.length)N.push(["👍","<b>Nicely spread on the surface.</b> Next, let's look at fees, how much income it pays, and whether it matches your timeline."]);
+  $("#al-notes").innerHTML=N.map(function(n){return '<div class="lever" style="justify-content:flex-start"><span style="font-size:20px">'+n[0]+'</span><span>'+n[1]+'</span></div>'}).join("");
+}
+
+/* ---- step 6: estate ---- */
+function renderEstate(){
+  var P=num($("#es-prop")),A=num($("#es-oth")),n=Math.max(2,Math.min(8,Math.round(num($("#es-n"))||2)));
+  var total=P+A,fair=total/n,others=A/(n-1),buy=Math.max(0,P-fair),eq=Math.max(0,(n-1)*P-A);
+  var kids=[["Child who stays",P,"var(--brand)"]];for(var i=1;i<n;i++)kids.push(["Child "+(i+1),others,"var(--accent)"]);
+  var mx=Math.max(P,others,fair,1);
+  var h='<div class="foot" style="margin:0 0 6px">If the child who stays simply keeps the home, and the others share everything else:</div><div class="kids">'+
+    kids.map(function(k){return '<div class="kid"><span>'+k[0]+'</span><div class="bar"><i style="width:'+(k[1]/mx*100)+'%;background:'+k[2]+'"></i></div><span class="v">'+fmt(k[1])+'</span></div>'}).join("")+
+    '<div class="kid"><span style="color:var(--muted)">Fair share</span><div class="bar"><i style="width:'+(fair/mx*100)+'%;background:var(--c5)"></i></div><span class="v" style="color:var(--muted)">'+fmt(fair)+'</span></div></div>';
+  if(P>others+1){
+    h+='<div class="opt"><b class="t">Option 1: the child who stays buys the others out</b>They pay about <b>'+fmt(buy)+'</b> in total to their siblings so everyone ends up with '+fmt(fair)+'. Often needs a loan, at a stressful time.</div>';
+    h+='<div class="opt"><b class="t">Option 2: plan an "equaliser" now</b>Set aside about <b>'+fmt(eq)+'</b> for the other children, for example through an insurance payout to them, so each of them also receives '+fmt(P)+'. Nobody has to pay anybody, and the home stays in the family.</div>';
+  } else h+='<div class="opt"><b class="t">Already close to even</b>Everything else is enough to match the home\'s value. Write it down clearly in your will so there\'s no room for doubt.</div>';
+  $("#es-out").innerHTML=h;
+  var now=num($("#em-now")),want=num($("#em-want")),gap=Math.max(0,want-now);
+  $("#em-out").innerHTML=gap>0?'<div class="permit" style="margin-top:0"><span>The gap to the legacy you want</span><b class="big">'+fmt(gap)+'</b><span>That\'s the difference between your estate and a gift that could carry your grandchildren and beyond.</span></div>'+
+    '<div class="levers" style="margin-top:12px"><div class="lever" style="justify-content:flex-start"><span style="font-size:20px">📈</span><span><b>Keep what you won\'t spend invested for the long term.</b> Money meant for the next generation has decades to grow.</span></div>'+
+    '<div class="lever" style="justify-content:flex-start"><span style="font-size:20px">🛡️</span><span><b>Legacy insurance.</b> A premium today can create a larger payout later, paid directly to the people you name, outside the estate.</span></div>'+
+    '<div class="lever" style="justify-content:flex-start"><span style="font-size:20px">🤝</span><span><b>Trusts and clear nominations.</b> Decide who receives what and when, so the wealth lasts more than one generation.</span></div></div>'
+    :'<div class="opt">You\'re already set to leave what you want. Let\'s make sure it reaches the right people smoothly.</div>';
+}
+["#es-prop","#es-oth","#es-n","#em-now","#em-want"].forEach(function(id){$(id).addEventListener("input",renderEstate)});
+
+function saveRet(){/*v3*/var o={};Object.keys(RI).forEach(function(k){o[k]=RI[k].value});o.ex={};$$(".ex").forEach(function(el){o.ex[el.dataset.k]=el.value});o.al={};$$(".al").forEach(function(el){o.al[el.dataset.k]=el.value});store.set("ret3",o);store.set("streams",streams())}
+Object.keys(RI).forEach(function(k){RI[k].addEventListener("input",renderRetire)});
+$$(".st").forEach(function(el){el.addEventListener("input",renderRetire)});
+$$(".ex").forEach(function(el){el.addEventListener("input",function(){$("#rt-need").value=Math.round(breakdown().tot);renderRetire()})});
+$$("#v-retire .acc>button").forEach(function(b){b.addEventListener("click",function(){b.parentNode.classList.toggle("open")})});
+$$(".al").forEach(function(el){el.addEventListener("input",function(){renderAlloc();saveRet()})});
+renderRetire();
+
+function retireText(){var p=rParams(),R=rsim(p),S=streams(),E=expenses(),A=alloc(),i=0,todo=[],cnt=0;
+  RCL.forEach(function(g){g[1].forEach(function(c){if(!rdone[i])todo.push(c[0]);i++})});
+  STREAMS.forEach(function(x){if(S[x[0]]>0)cnt++});
+  return ["Hi Celine! Here's my plan from the Retirement Ready tool.","",
+   (RI.name.value.trim()?RI.name.value.trim()+" · ":"")+"Age "+p.age+" · Stop work at "+p.ret,
+   "Monthly costs in retirement: "+fmt(E.tot)+" (essentials "+fmt(E.ess)+", lifestyle "+fmt(E.life)+")",
+   "Income streams: "+cnt+" of 5 · CPF LIFE "+fmt(S.cpf)+" from "+RS.start+", rent "+fmt(S.rent)+", annuities "+fmt(S.ann)+", dividends "+fmt(S.div)+", interest "+fmt(S.int),
+   "Savings: "+fmt(p.sav)+" (+"+fmt(p.add)+"/mo) · "+(R.last===null?"lasts past "+p.until:"runs out ~"+Math.floor(R.last))+" · safe spend about "+fmt(safeSpend(p))+"/mo",
+   "Investments: "+fmt(A.t)+" (SG "+fmt(A.sg)+", US "+fmt(A.us)+", other "+fmt(A.ot)+", bonds "+fmt(A.bd)+", cash "+fmt(A.cs)+") · approach: "+(th.map(function(k){return THESIS[k]}).join(", ")||"-"),
+   "Checklist still to do: "+(todo.join(", ")||"all done"),"","Could we chat about my retirement game plan?"].join("\n")}
+wireSend("#tg-retire","#copy-retire","#toast-retire",retireText);
+
+wireSend("#tg-invest",null,"#toast-invest",function(){return "Hi Celine! I went through your Investing Starter and I'd like to chat about getting started."});
+
+/* ================= PDF SUMMARIES ================= */
+var DL=null;
+(function(){try{if(window.claude&&claude.use)claude.use("downloads").then(function(d){DL=d;if(d)$$(".pdfbtn").forEach(function(b){b.hidden=false})})}catch(e){}})();
+function loadJsPDF(){return new Promise(function(res,rej){if(window.jspdf)return res();var s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";s.onload=function(){res()};s.onerror=rej;document.head.appendChild(s)})}
+function clean(t){return String(t==null?"":t).replace(/[−–]/g,"-").replace(/≈/g,"~").replace(/→/g,"->").replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/…/g,"...")
+  .replace(/[☀-➿️‍]|[\uD83C-\uDBFF][\uDC00-\uDFFF]/g,"").replace(/\s+/g," ").trim()}
+function parts(el){return Array.prototype.map.call(el.children,function(c){return clean(c.innerText)}).filter(Boolean).join(": ")}
+function statusText(sel){var e=$(sel);if(!e)return "";var h=e.querySelector("b.h"),all=clean(e.innerText);if(!h)return all;var ht=clean(h.innerText),rest=clean(all.replace(ht,""));return ht+(/^[a-z]/.test(rest)?" ":". ")+rest}
+function optText(o){var b=o.querySelector("b.t");if(!b)return clean(o.innerText);var bt=clean(b.innerText);return bt+": "+clean(o.innerText).replace(bt,"").trim()}
+function txt(sel){var e=$(sel);return e?clean(e.innerText||e.textContent):""}
+var BR=[31,77,63],AC=[217,112,63],MU=[110,118,114],LN=[228,220,206],INK=[30,43,38],SOFT=[243,236,226];
+function makePDF(title,who){
+  var doc=new window.jspdf.jsPDF({unit:"pt",format:"a4"}),W=595,H=842,M=44,y=0;
+  function head(){doc.setFillColor.apply(doc,BR);doc.rect(0,0,W,64,"F");doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(15);doc.text("Celine's Cents",M,30);
+    doc.setFont("helvetica","normal");doc.setFontSize(10);doc.text(title,M,47);doc.text(new Date().toLocaleDateString("en-SG",{day:"numeric",month:"long",year:"numeric"}),W-M,30,{align:"right"});y=94}
+  head();
+  doc.setTextColor.apply(doc,AC);doc.setFont("helvetica","bold");doc.setFontSize(9);doc.text("PREPARED FOR",M,y);y+=16;
+  doc.setTextColor.apply(doc,INK);doc.setFontSize(18);doc.text(clean(who)||"Client",M,y);y+=24;
+  var P={doc:doc,
+    need:function(h){if(y+h>H-70){doc.addPage();head()}},
+    h:function(t){P.need(80);y+=10;doc.setTextColor.apply(doc,BR);doc.setFont("helvetica","bold");doc.setFontSize(12.5);doc.text(clean(t),M,y);y+=6;doc.setDrawColor.apply(doc,LN);doc.setLineWidth(1);doc.line(M,y,W-M,y);y+=16},
+    big:function(t,color){P.need(30);doc.setTextColor.apply(doc,color||AC);doc.setFont("helvetica","bold");doc.setFontSize(16);var L=doc.splitTextToSize(clean(t),W-2*M);doc.text(L,M,y);y+=L.length*20+4},
+    p:function(t,opt){opt=opt||{};doc.setFont("helvetica",opt.bold?"bold":"normal");doc.setFontSize(opt.size||10.5);var L=doc.splitTextToSize(clean(t),W-2*M-(opt.indent||0));P.need(L.length*14+4);doc.setTextColor.apply(doc,opt.muted?MU:INK);doc.text(L,M+(opt.indent||0),y);y+=L.length*(opt.size?opt.size*1.35:14)+(opt.gap==null?6:opt.gap)},
+    bullet:function(t){doc.setFont("helvetica","normal");doc.setFontSize(10.5);var L=doc.splitTextToSize(clean(t),W-2*M-14);P.need(L.length*14+4);doc.setTextColor.apply(doc,AC);doc.setFont("helvetica","bold");doc.setFontSize(10.5);doc.text("•",M+2,y);doc.setTextColor.apply(doc,INK);doc.setFont("helvetica","normal");doc.text(L,M+14,y);y+=L.length*14+4},
+    kv:function(rows){var cw=(W-2*M)/2;for(var i=0;i<rows.length;i+=2){P.need(34);for(var j=0;j<2;j++){var r=rows[i+j];if(!r)continue;var x=M+j*cw;
+      doc.setTextColor.apply(doc,MU);doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.text(clean(r[0]).toUpperCase(),x,y);
+      doc.setTextColor.apply(doc,INK);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text(clean(r[1]),x,y+14)}y+=32}},
+    table:function(hd,rows,widths,align){var tw=W-2*M,ws=widths.map(function(w){return w*tw}),rowH=function(r){doc.setFontSize(9.5);var n=1;r.forEach(function(c,i){n=Math.max(n,doc.splitTextToSize(clean(c),ws[i]-8).length)});return n*12+10};
+      function drawHead(){P.need(24);doc.setFillColor.apply(doc,SOFT);doc.rect(M,y-12,tw,20,"F");doc.setTextColor.apply(doc,MU);doc.setFont("helvetica","bold");doc.setFontSize(8);var x=M;
+        hd.forEach(function(c,i){var a=align&&align[i]==="r";doc.text(clean(c).toUpperCase(),a?x+ws[i]-4:x+4,y+1,a?{align:"right"}:undefined);x+=ws[i]});y+=18}
+      drawHead();
+      rows.forEach(function(r){var h=rowH(r);if(y+h>H-70){doc.addPage();head();drawHead()}var x=M;
+        var bold=r._bold;doc.setFont("helvetica",bold?"bold":"normal");doc.setFontSize(9.5);doc.setTextColor.apply(doc,INK);
+        r.forEach(function(c,i){var L=doc.splitTextToSize(clean(c),ws[i]-8),a=align&&align[i]==="r";doc.text(L,a?x+ws[i]-4:x+4,y,a?{align:"right"}:undefined);x+=ws[i]});
+        y+=h-6;doc.setDrawColor.apply(doc,LN);doc.setLineWidth(0.6);doc.line(M,y-6,W-M,y-6);y+=4});y+=6},
+    finish:function(){var n=doc.getNumberOfPages();for(var i=1;i<=n;i++){doc.setPage(i);doc.setDrawColor.apply(doc,LN);doc.line(M,H-58,W-M,H-58);
+      doc.setTextColor.apply(doc,INK);doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.text("Celine Sim · Wealth Planner · Alpha Wealth Financial Advisers Pte Ltd · MAS Rep. No. CSY300926263 · Telegram @celineesim",M,H-44);
+      doc.setTextColor.apply(doc,MU);doc.setFont("helvetica","normal");doc.setFontSize(7.5);
+      doc.text(doc.splitTextToSize("For general information only, not financial advice or a recommendation to buy any product. Projections are illustrations using the rates shown and are not guaranteed. Please speak with a licensed representative before making financial decisions.",W-2*M-50),M,H-32);
+      doc.text(i+" / "+n,W-M,H-32,{align:"right"})}return doc.output("arraybuffer")}};
+  return P}
+function fileName(kind,who){var n=clean(who).replace(/[^A-Za-z0-9 &-]/g,"").trim().replace(/\s+/g,"-")||"Client";return "Celines-Cents-"+kind+"-"+n+"-"+new Date().toISOString().slice(0,10)+".pdf"}
+function savePDF(btn,toast,build){
+  if(!DL){$(toast).textContent="PDF download isn't available in this view. Use Copy my plan instead.";return}
+  var old=btn.textContent;btn.textContent="Preparing PDF...";btn.disabled=true;
+  loadJsPDF().then(function(){var o=build();return DL.save({filename:o.name,data:o.data})})
+   .then(function(r){$(toast).textContent=r&&r.status==="delivered"?"Sent.":"PDF saved."})
+   .catch(function(e){var c=e&&e.code;$(toast).textContent=c==="declined"?"Download cancelled.":c==="rate_limited"?"A download prompt is already open.":"Couldn't create the PDF here. Use Copy my plan instead."})
+   .then(function(){btn.textContent=old;btn.disabled=false})}
+
+function buildGoalsPDF(){
+  var R=compute(),who=couple()?nm1()+" & "+nm2():(I.name.value.trim()||"Client");
+  var P=makePDF(couple()?"Goals Plan for a couple":"Goals Plan",who);
+  P.h("About you");
+  if(couple())P.kv([[nm1()+" · age",age()],[nm2()+" · age",age2()],[nm1()+" · salary / take-home",fmt(num(I.pay))+" / "+fmt(thA())],[nm2()+" · salary / take-home",fmt(num(P2.pay))+" / "+fmt(thB())],["Household living costs",fmt(R.live)+" a month"],["Insurance premiums",fmt(R.ins)+" a month"],["Savings today",fmt(R.sav)],["CPF OA today",fmt(T("oa"))]]);
+  else P.kv([["Age",age()],["Salary before CPF",fmt(num(I.pay))+" a month"],["Take-home pay",fmt(R.pay)+" a month"],["Living costs",fmt(R.live)+" a month"],["Insurance premiums",fmt(R.ins)+" a month"],["Savings today",fmt(R.sav)],["CPF OA today",fmt(num(I.oa))],["Free for goals",fmt(R.avail)+" a month"]]);
+  P.h("Your plan");
+  P.big("Put aside "+fmt(R.need)+" a month to reach every goal");
+  var rows=[["Emergency fund (6 months)",R.efMonthly>0?"1 yr":"Now",fmt(R.ef),"-",fmt(R.efFrom),R.efMonthly>0?fmt(R.efMonthly):"Covered"]];
+  R.rows.forEach(function(r){var c=CAT(r.g.cat),note=r.oaUse>0?" (cash, after "+fmt(r.oaUse)+" CPF OA)":"";
+    rows.push([goalTitle(r.g)+(r.share===0.5?" (your half)":"")+note,(YEAR+r.g.yrs)+" · "+r.g.yrs+" yrs",r.oaUse>0&&r.then<1?"$0 (CPF OA)":fmt(r.then),pct(r.b.r,1).replace(".0%","%"),r.alloc>0?fmt(r.alloc):"-",r.m>0.5?fmt(r.m):"Covered"])});
+  var tot=["Total a month","","","","",fmt(R.need)];tot._bold=true;rows.push(tot);
+  P.table(["Goal","When","Cost then","Grows at","Set aside today","A month"],rows,[0.34,0.13,0.14,0.11,0.14,0.14],["l","l","r","r","r","r"]);
+  P.p("Prices rise "+pct(INFL,1)+" a year for inflation. Long-term goals assume "+pct(S.rate)+" a year growth. Savings fill the emergency fund first, then the soonest goals.",{muted:true,size:9});
+  P.h("How your take-home pay could work");
+  var spare=Math.max(0,R.avail-R.saveA-R.invA),pay=Math.max(R.pay,1);
+  P.table(["","A month","Share of take-home"],[["Living costs",fmt(R.live),pct(R.live/pay)],["Insurance",fmt(R.ins),pct(R.ins/pay)],["Goals: saving",fmt(R.saveA),pct(R.saveA/pay)],["Goals: investing",fmt(R.invA),pct(R.invA/pay)],["Still free",fmt(spare),pct(spare/pay)]],[0.5,0.25,0.25],["l","r","r"]);
+  P.p(statusText("#status .status"),{bold:true});
+  $$("#status .checks>div").forEach(function(d){P.bullet(d.innerText)});
+  y_todo();function y_todo(){$$("#todo p").forEach(function(p){P.p(p.innerText)})}
+  if(couple()){P.h("How you two could share it ("+(S.share==="income"?"by income":"50/50")+")");
+    var p1=thA(),p2=thB(),t2=Math.max(p1+p2,1),f1=S.share==="income"?p1/t2:0.5,f2=1-f1,goals=R.saveA+R.invA;
+    var row=function(nm,pay,ins,f){return [nm,fmt(pay),fmt(ins),fmt(R.live*f),fmt(goals*f),fmt(pay-ins-R.live*f-goals*f)]};
+    P.table(["","Take-home","Insurance","Living costs","Goals","Left for self"],[row(nm1(),p1,num(I.ins),f1),row(nm2(),p2,num(P2.ins),f2)],[0.2,0.16,0.16,0.16,0.16,0.16],["l","r","r","r","r","r"])}
+  P.h("Next step");P.p("Let's go through this plan together and find the best way to get you there. Message Celine on Telegram @celineesim.");
+  return {name:fileName("Goals-Plan",who),data:P.finish()}}
+
+function buildRetirePDF(){
+  var p=rParams(),R=rsim(p),S=streams(),E=expenses(),A=alloc(),safe=safeSpend(p),cnt=0;STREAMS.forEach(function(x){if(S[x[0]]>0)cnt++});
+  var rwho=RI.name.value.trim()||"Client";var Pd=makePDF("Retirement Game Plan",rwho);
+  Pd.h("Your numbers");
+  Pd.kv([["Age now",p.age],["Stop working at",p.ret],["Monthly spending in retirement",fmt(E.tot)],["Plan until age",p.until],["Savings & investments",fmt(p.sav)],["Still adding",fmt(p.add)+" a month"]]);
+  Pd.h("Your income streams: "+cnt+" of 5");
+  var sr=STREAMS.map(function(x){var v=S[x[0]];return [x[2],v>0?fmt(x[0]==="cpf"?v*(RS.start===70?DEFER70:1):v)+(x[0]==="cpf"?" from age "+RS.start:""):"Not yet"]});
+  Pd.table(["Stream","A month"],sr,[0.6,0.4],["l","r"]);
+  Pd.p(txt("#ans-cover"));
+  Pd.h("Will your money last?");
+  Pd.p(statusText("#r-status .status"),{bold:true});
+  Pd.big("You can safely spend up to "+fmt(safe)+" a month",BR);
+  Pd.p(clean($("#r-permit span:last-child")?$("#r-permit span:last-child").innerText:""));
+  if(txt("#r-next"))Pd.p(txt("#r-next"));
+  Pd.kv([["Savings when you stop work",fmt(R.potAtRet)],["Needed then to last to "+p.until,fmt(R.need)]]);
+  Pd.h("Your paycheck plan: three buckets");
+  var W=Math.max(0,p.spend-p.other-cpfAt(p,p.ret))*12,P0=Math.max(0,R.potAtRet),b1=Math.min(P0,2*W),b2=Math.min(P0-b1,5*W),b3=P0-b1-b2;
+  Pd.table(["Bucket","Amount","What it's for"],[["1 · Cash",fmt(b1),"Next 2 years of withdrawals (FD, T-bills, SSB)"],["2 · Income",fmt(b2),"Years 3 to 7 (bonds, income funds, annuities)"],["3 · Growth",fmt(b3),"Year 8 onwards and your legacy"]],[0.2,0.2,0.6],["l","r","l"]);
+  Pd.h("Ways to change the result");
+  $$("#r-levers .lever").forEach(function(l){Pd.bullet(parts(l))});
+  if(A.t>0){Pd.h("Your investment mix");
+    Pd.table(["","Amount","Share"],Object.keys(ALL).filter(function(k){return A[k]>0}).map(function(k){return [ALL[k][0],fmt(A[k]),pct(A[k]/A.t)]}),[0.5,0.25,0.25],["l","r","r"]);
+    if(th.length)Pd.p("Approach: "+th.map(function(k){return THESIS[k]}).join(", "),{muted:true});
+    $$("#al-notes .lever").forEach(function(l){Pd.bullet(l.innerText)})}
+  Pd.h("Estate: keeping it fair");
+  Pd.p("Property "+fmt(num($("#es-prop")))+", other assets "+fmt(num($("#es-oth")))+", "+Math.max(2,Math.round(num($("#es-n"))||2))+" children.",{muted:true});
+  $$("#es-out .opt").forEach(function(o){Pd.bullet(optText(o))});
+  var i=0,done=[],todo=[];RCL.forEach(function(g){g[1].forEach(function(c){(rdone[i]?done:todo).push(c[0]);i++})});
+  Pd.h("Retirement checklist: "+done.length+" of "+(done.length+todo.length)+" done");
+  if(done.length)Pd.p("Done: "+done.join(", "));
+  if(todo.length)Pd.p("Still to do: "+todo.join(", "),{bold:true});
+  Pd.h("Next step");Pd.p("Let's build your retirement game plan together. Message Celine on Telegram @celineesim.");
+  return {name:fileName("Retirement-Plan",rwho),data:Pd.finish()}}
+$("#pdf-goals").addEventListener("click",function(){savePDF(this,"#toast-goals",buildGoalsPDF)});
+$("#pdf-retire").addEventListener("click",function(){savePDF(this,"#toast-retire",buildRetirePDF)});
+
+})();
+</script>
+</body>
+</html>
