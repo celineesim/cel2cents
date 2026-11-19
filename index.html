@@ -1540,16 +1540,24 @@ function makePDF(title,who,sub){
           x+=ws[i]});
         y+=h;stroke(LN);doc.setLineWidth(0.5);doc.line(M,y,M+tw,y)});y+=10},
     // goal timeline: items [{yr, label, amt, col}]
-    timeline:function(items,y0){if(!items.length)return;P.need(108);var x0=M+18,x1=M+CW-18,ys=items.map(function(i){return i.yr}),a=Math.min(y0,Math.min.apply(null,ys)),b=Math.max.apply(null,ys);if(b-a<4)b=a+4;
-      var X=function(v){return x0+(x1-x0)*(v-a)/(b-a)},ly=y+50;
-      stroke(SAND);doc.setLineWidth(3);doc.line(x0,ly,x1,ly);
-      fill(SAND);doc.circle(x0,ly,3,"F");ink(MU);font("bold",7.5);doc.text("TODAY",x0,ly+14,{align:"center"});
-      var used=[];items.slice().sort(function(p,q){return p.yr-q.yr}).forEach(function(it,k){var cx=X(it.yr),up=k%2===0;
-        fill(it.col||AC);doc.circle(cx,ly,6,"F");fill(WHITE);doc.circle(cx,ly,2.4,"F");
-        var tx=Math.max(M+50,Math.min(M+CW-50,cx));stroke(LN);doc.setLineWidth(0.8);doc.line(cx,ly+(up?-7:7),cx,ly+(up?-16:16));
-        ink(INK);font("bold",8.5);var L=lines(it.label,110,8.5).slice(0,1);doc.text(L,tx,up?ly-30:ly+27,{align:"center"});
-        ink(MU);font("normal",8);doc.text(clean(it.yr+" · "+it.amt),tx,up?ly-20:ly+37,{align:"center"})});
-      y+=104},
+    timeline:function(items,y0){if(!items.length)return;
+      // one evenly spaced column per year; goals in the same year stack in that column
+      var G={};items.forEach(function(it){(G[it.yr]=G[it.yr]||{yr:it.yr,col:it.col,rows:[]}).rows.push(it)});
+      var groups=Object.keys(G).map(function(k){return G[k]}).sort(function(p,q){return p.yr-q.yr});
+      var n=groups.length,lead=34,cw=(CW-lead)/n,tw=cw-8;
+      groups.forEach(function(g){g.blocks=g.rows.map(function(r){return {t:lines(r.label,tw,8.3),a:clean(r.amt)}});
+        g.h=14+g.blocks.reduce(function(s,b){return s+b.t.length*10+11},0)});
+      var hMax=Math.max.apply(null,groups.map(function(g){return g.h}));P.need(hMax+44);
+      var ly=y+14,xs=M+6;
+      stroke(SAND);doc.setLineWidth(3);doc.line(xs,ly,M+CW-cw/2+2,ly);
+      fill(SAND);doc.circle(xs,ly,3.5,"F");ink(MU);font("bold",6.8);doc.text("TODAY",xs-3,ly-8);
+      groups.forEach(function(g,i){var cx=M+lead+cw*i+cw/2;
+        fill(g.col||AC);doc.circle(cx,ly,6.5,"F");fill(WHITE);doc.circle(cx,ly,2.6,"F");
+        ink(g.col||AC);font("bold",8.5);doc.text(String(g.yr),cx,ly-10,{align:"center"});
+        var ty=ly+20;g.blocks.forEach(function(bk,k){if(k){stroke(LN);doc.setLineWidth(0.5);doc.line(cx-tw/2+8,ty-8,cx+tw/2-8,ty-8)}
+          ink(INK);font("bold",8.3);doc.text(bk.t,cx,ty,{align:"center"});ty+=bk.t.length*10;
+          ink(MU);font("normal",7.8);doc.text(bk.a,cx,ty,{align:"center"});ty+=13})});
+      y=ly+20+hMax},
     // area chart: pts=[[x,v]], marks=[{x,label,col}]
     chart:function(pts,marks,opt){opt=opt||{};var h=150,P0=y+8;P.need(h+30);var xs=pts.map(function(p){return p[0]}),vs=pts.map(function(p){return p[1]}),
         xa=Math.min.apply(null,xs),xb=Math.max.apply(null,xs),vb=Math.max.apply(null,vs.concat([1]))*1.1,L=M+42,R=M+CW-6,T=P0,B=P0+h;
@@ -1603,6 +1611,8 @@ function savePDF(btn,toast,build){
 
 function statusOf(sel){var e=$(sel);if(!e)return null;var h=e.querySelector("b.h"),ht=h?clean(h.innerText):"",all=clean(e.innerText),body=clean(all.replace(ht,""));
   return {kind:e.classList.contains("good")?"good":e.classList.contains("bad")?"bad":"warn",head:ht,body:body}}
+function goalTarget(g){var c=CAT(g.cat);if(c.retire)return fmt(g.mo)+" a month";return fmt(g.c)}
+function goalTargetK(g){var c=CAT(g.cat);if(c.retire)return fmt(g.mo)+"/mo";return fmtK(g.c)}
 function buildGoalsPDF(){
   var R=compute(),who=couple()?nm1()+" & "+nm2():(I.name.value.trim()||"Client"),pay=Math.max(R.pay,1),spare=Math.max(0,R.avail-R.saveA-R.invA);
   var P=makePDF(couple()?"Goals Plan for two":"Goals Plan",who,couple()?"Planning together":"Age "+age());
@@ -1618,17 +1628,17 @@ function buildGoalsPDF(){
     {l:"Emergency fund",v:fmt(R.ef),s:R.efMonthly<=0?"6 months: fully covered":"6 months: "+fmt(R.ef-R.efFrom)+" to go",c:R.efMonthly<=0?GOOD:WARN},
     {l:"Already putting aside",v:fmt(R.cs+R.ci),s:"saving + investing a month"}]);
   P.h("Your goals",pct(INFL,1)+" inflation · "+pct(S.rate)+" growth for long-term goals");
-  var tl=R.rows.map(function(r){return {yr:YEAR+r.g.yrs,label:goalTitle(r.g),amt:fmtK(r.then),col:r.b.k==="l"?BR:AC}});
-  if(R.efMonthly>0)tl.unshift({yr:YEAR+1,label:"Emergency fund",amt:fmtK(R.ef),col:GOLD});
+  var tl=R.rows.map(function(r){return {yr:YEAR+r.g.yrs,label:goalTitle(r.g),amt:goalTargetK(r.g)+" goal",col:r.b.k==="l"?BR:AC}});
+  if(R.efMonthly>0)tl.unshift({yr:YEAR+1,label:"Emergency fund",amt:fmtK(R.ef)+" goal",col:GOLD});
   P.timeline(tl,YEAR);
-  var ef=["Emergency fund",R.efMonthly>0?String(YEAR+1):"Now",fmt(R.ef),"Cash",{bar:R.ef?R.efFrom/R.ef:1,t:pct(R.ef?R.efFrom/R.ef:1),c:GOLD},R.efMonthly>0?fmt(R.efMonthly):"Covered"];ef._sub="6 months of costs";
+  var ef=["Emergency fund",R.efMonthly>0?String(YEAR+1):"Now",fmt(R.ef),fmt(R.ef),"Cash",{bar:R.ef?R.efFrom/R.ef:1,t:pct(R.ef?R.efFrom/R.ef:1),c:GOLD},R.efMonthly>0?fmt(R.efMonthly):"Covered"];ef._sub="6 months of costs";
   var rows=[ef];
   R.rows.forEach(function(r){var sub=[r.g.yrs+" yrs away"];if(r.share===0.5)sub.push("your half");if(r.oaUse>0)sub.push("after "+fmtK(r.oaUse)+" CPF OA");
-    var row=[goalTitle(r.g),String(YEAR+r.g.yrs),r.oaUse>0&&r.then<1?"$0":fmt(r.then),pct(r.b.r,1).replace(".0%","%"),{bar:r.fromPct,t:pct(r.fromPct),c:r.b.k==="l"?BR:AC},r.m>0.5?fmt(r.m):"Covered"];
+    var row=[goalTitle(r.g),String(YEAR+r.g.yrs),goalTarget(r.g),r.oaUse>0&&r.then<1?"$0":fmt(r.then),pct(r.b.r,1).replace(".0%","%"),{bar:r.fromPct,t:pct(r.fromPct),c:r.b.k==="l"?BR:AC},r.m>0.5?fmt(r.m):"Covered"];
     row._sub=sub.join(" · ");rows.push(row)});
-  var tot=["Total a month","","","","",fmt(R.need)];tot._total=true;rows.push(tot);
-  P.table(["Goal","Year","Cost then","Grows at","Funded by savings today","A month"],rows,[0.3,0.09,0.13,0.1,0.24,0.14],["l","l","r","r","l","r"]);
-  P.p("Cost then is the price in that year after inflation. Your current savings fill the emergency fund first, then the soonest goals. Goals 10+ years away are invested; nearer ones are saved.",{muted:true,size:8.3});
+  var tot=["Total a month","","","","","",fmt(R.need)];tot._total=true;rows.push(tot);
+  P.table(["Goal","Year","Your goal (today's $)","You pay then","Growth","Funded today","A month"],rows,[0.25,0.07,0.15,0.14,0.08,0.18,0.13],["l","l","r","r","r","l","r"]);
+  P.p("Your goal is the amount you chose, in today's dollars. You pay then is your share in that year after inflation, less any CPF OA used. Your current savings fill the emergency fund first, then the soonest goals. Goals 10+ years away are invested; nearer ones are saved.",{muted:true,size:8.3});
   P.h("How your take-home pay could work");
   P.stack([["Living costs",R.live,GREY],["Insurance",R.ins,SAGE],["Goals: saving",R.saveA,AC],["Goals: investing",R.invA,BR],["Still free",spare,SAND,INK]],{total:pay,unit:" a month"});
   var insP=R.ins/pay,invP=R.invA/pay,items=[];
