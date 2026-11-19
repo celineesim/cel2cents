@@ -1012,6 +1012,9 @@ function renderTimeline(R){
 
 function arc(cx,cy,r,a0,a1){var p=function(a){return [cx+r*Math.cos(a),cy+r*Math.sin(a)]},s=p(a0),e=p(a1),l=a1-a0>Math.PI?1:0;
   return "M"+s[0]+" "+s[1]+" A"+r+" "+r+" 0 "+l+" 1 "+e[0]+" "+e[1]}
+function noInsurance(){var o=[];if(couple()){if(num(I.ins)<=0)o.push(nm1());if(num(P2.ins)<=0)o.push(nm2())}else if(num(I.ins)<=0)o.push(I.name.value.trim()||"You");return o}
+function insFlagText(L){var who=couple()?L.join(" and ")+(L.length>1?" have":" has"):"You have";
+  return who+" no cash insurance premiums. That usually means no critical illness, life or disability cover beyond basic CPF schemes like MediShield Life. One serious illness or accident could wipe out these savings and every goal here."}
 function renderBudget(R){
   var pay=Math.max(R.pay,1),spare=Math.max(0,R.avail-R.saveA-R.invA);
   var segs=[["Living costs",R.live,"var(--c1)"],["Insurance · 15% max",R.ins,"var(--c2)"],["Goals: saving",R.saveA,"var(--c3)"],["Goals: investing",R.invA,"var(--c4)"],["Still free",spare,"var(--c5)"]];
@@ -1026,11 +1029,12 @@ function renderBudget(R){
   if(R.avail<=0){cls="bad";icon="⛔";head="Budget first";body="Living costs and insurance are more than your take-home pay."}
   else if(gap>0.5){cls=gap>R.avail*0.5?"bad":"warn";icon="⚠️";head="Needs work";body="About "+fmt(gap)+" a month short of fully funding every goal."}
   else{cls="good";icon="✅";head="On track";body=(couple()?"Your combined pay":"Your pay")+" covers every goal, with "+fmt(-gap)+" a month to spare."}
-  var insLine=function(who,ins,pay){var r=ins/Math.max(pay,1);return '<div>'+(r<=0.15?"✓":"✗")+' '+who+' insurance is '+pct(r)+' of take-home '+(r<=0.15?"(within the 15% guide)":"(above the 15% guide, worth a review)")+'</div>'};
+  var insLine=function(who,ins,pay){var r=ins/Math.max(pay,1);if(ins<=0)return '<div style="color:var(--bad);font-weight:700">🚩 '+who+' insurance: none. Get covered before investing.</div>';return '<div>'+(r<=0.15?"✓":"✗")+' '+who+' insurance is '+pct(r)+' of take-home '+(r<=0.15?"(within the 15% guide)":"(above the 15% guide, worth a review)")+'</div>'};
   var chk='<div class="checks">'+(couple()?insLine(esc(nm1())+"'s",num(I.ins),thA())+insLine(esc(nm2())+"'s",num(P2.ins),thB()):insLine("Your",R.ins,R.pay))+
     '<div>'+(invP>=0.10?"✓":"✗")+' Investing '+pct(invP)+' of take-home '+(invP>=0.10?"(meets the 10% guide)":"(the guide suggests at least 10%)")+'</div>'+
     '<div>'+(R.efMonthly<=0?"✓ Emergency fund fully covered":"✗ Emergency fund needs "+fmt(R.ef-R.efFrom)+" more")+'</div></div>';
-  $("#status").innerHTML='<div class="status '+cls+'"><span class="ic">'+icon+'</span><div><b class="h">'+head+'</b>'+body+'</div></div>'+chk;
+  var NI=noInsurance(),flag=NI.length?'<div class="status bad" style="margin-top:10px"><span class="ic">🚩</span><div><b class="h">Red flag: no insurance yet</b>'+esc(insFlagText(NI))+' Let\'s put protection in place first: a hospital plan, then critical illness, death and disability cover.</div></div>':'';
+  $("#status").innerHTML='<div class="status '+cls+'"><span class="ic">'+icon+'</span><div><b class="h">'+head+'</b>'+body+'</div></div>'+flag+chk;
 
   var t='';
   if(!R.rows.length&&R.efMonthly<=0){t='<p>Add a goal above and your action plan appears here.</p>'}
@@ -1444,36 +1448,145 @@ function parts(el){return Array.prototype.map.call(el.children,function(c){retur
 function statusText(sel){var e=$(sel);if(!e)return "";var h=e.querySelector("b.h"),all=clean(e.innerText);if(!h)return all;var ht=clean(h.innerText),rest=clean(all.replace(ht,""));return ht+(/^[a-z]/.test(rest)?" ":". ")+rest}
 function optText(o){var b=o.querySelector("b.t");if(!b)return clean(o.innerText);var bt=clean(b.innerText);return bt+": "+clean(o.innerText).replace(bt,"").trim()}
 function txt(sel){var e=$(sel);return e?clean(e.innerText||e.textContent):""}
-var BR=[31,77,63],AC=[217,112,63],MU=[110,118,114],LN=[228,220,206],INK=[30,43,38],SOFT=[243,236,226];
-function makePDF(title,who){
-  var doc=new window.jspdf.jsPDF({unit:"pt",format:"a4"}),W=595,H=842,M=44,y=0;
-  function head(){doc.setFillColor.apply(doc,BR);doc.rect(0,0,W,64,"F");doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(15);doc.text("Celine's Cents",M,30);
-    doc.setFont("helvetica","normal");doc.setFontSize(10);doc.text(title,M,47);doc.text(new Date().toLocaleDateString("en-SG",{day:"numeric",month:"long",year:"numeric"}),W-M,30,{align:"right"});y=94}
-  head();
-  doc.setTextColor.apply(doc,AC);doc.setFont("helvetica","bold");doc.setFontSize(9);doc.text("PREPARED FOR",M,y);y+=16;
-  doc.setTextColor.apply(doc,INK);doc.setFontSize(18);doc.text(clean(who)||"Client",M,y);y+=24;
-  var P={doc:doc,
-    need:function(h){if(y+h>H-70){doc.addPage();head()}},
-    h:function(t){P.need(80);y+=10;doc.setTextColor.apply(doc,BR);doc.setFont("helvetica","bold");doc.setFontSize(12.5);doc.text(clean(t),M,y);y+=6;doc.setDrawColor.apply(doc,LN);doc.setLineWidth(1);doc.line(M,y,W-M,y);y+=16},
-    big:function(t,color){P.need(30);doc.setTextColor.apply(doc,color||AC);doc.setFont("helvetica","bold");doc.setFontSize(16);var L=doc.splitTextToSize(clean(t),W-2*M);doc.text(L,M,y);y+=L.length*20+4},
-    p:function(t,opt){opt=opt||{};doc.setFont("helvetica",opt.bold?"bold":"normal");doc.setFontSize(opt.size||10.5);var L=doc.splitTextToSize(clean(t),W-2*M-(opt.indent||0));P.need(L.length*14+4);doc.setTextColor.apply(doc,opt.muted?MU:INK);doc.text(L,M+(opt.indent||0),y);y+=L.length*(opt.size?opt.size*1.35:14)+(opt.gap==null?6:opt.gap)},
-    bullet:function(t){doc.setFont("helvetica","normal");doc.setFontSize(10.5);var L=doc.splitTextToSize(clean(t),W-2*M-14);P.need(L.length*14+4);doc.setTextColor.apply(doc,AC);doc.setFont("helvetica","bold");doc.setFontSize(10.5);doc.text("•",M+2,y);doc.setTextColor.apply(doc,INK);doc.setFont("helvetica","normal");doc.text(L,M+14,y);y+=L.length*14+4},
-    kv:function(rows){var cw=(W-2*M)/2;for(var i=0;i<rows.length;i+=2){P.need(34);for(var j=0;j<2;j++){var r=rows[i+j];if(!r)continue;var x=M+j*cw;
-      doc.setTextColor.apply(doc,MU);doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.text(clean(r[0]).toUpperCase(),x,y);
-      doc.setTextColor.apply(doc,INK);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text(clean(r[1]),x,y+14)}y+=32}},
-    table:function(hd,rows,widths,align){var tw=W-2*M,ws=widths.map(function(w){return w*tw}),rowH=function(r){doc.setFontSize(9.5);var n=1;r.forEach(function(c,i){n=Math.max(n,doc.splitTextToSize(clean(c),ws[i]-8).length)});return n*12+10};
-      function drawHead(){P.need(24);doc.setFillColor.apply(doc,SOFT);doc.rect(M,y-12,tw,20,"F");doc.setTextColor.apply(doc,MU);doc.setFont("helvetica","bold");doc.setFontSize(8);var x=M;
-        hd.forEach(function(c,i){var a=align&&align[i]==="r";doc.text(clean(c).toUpperCase(),a?x+ws[i]-4:x+4,y+1,a?{align:"right"}:undefined);x+=ws[i]});y+=18}
+var BR=[31,77,63],AC=[217,112,63],MU=[110,118,114],LN=[228,220,206],INK=[30,43,38],SOFT=[243,236,226],WHITE=[255,255,255],
+  GOOD=[47,125,87],GOODS=[227,242,233],WARN=[180,101,27],WARNS=[253,240,223],BAD=[176,58,58],BADS=[251,230,230],
+  GOLD=[217,164,65],GREY=[154,163,158],SAND=[207,198,182],SAGE=[127,169,155],PALE=[233,183,154];
+function hexRGB(h){h=h.replace("#","");return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+function makePDF(title,who,sub){
+  var doc=new window.jspdf.jsPDF({unit:"pt",format:"a4"}),W=595,H=842,M=40,CW=W-2*M,y=0,BOT=H-80;
+  var fill=function(c){doc.setFillColor(c[0],c[1],c[2])},stroke=function(c){doc.setDrawColor(c[0],c[1],c[2])},
+      ink=function(c){doc.setTextColor(c[0],c[1],c[2])},font=function(w,s){doc.setFont("helvetica",w||"normal");doc.setFontSize(s||10)},
+      lines=function(t,w,s){font(null,s);return doc.splitTextToSize(clean(t),w)},
+      dateTxt=new Date().toLocaleDateString("en-SG",{day:"numeric",month:"long",year:"numeric"});
+  function mark(cx,cy,r){fill(AC);doc.circle(cx,cy,r,"F");ink(WHITE);font("bold",r*0.95);doc.text("C",cx,cy+r*0.34,{align:"center"})}
+  function head(first){
+    var hh=first?124:46;fill(BR);doc.rect(0,0,W,hh,"F");
+    var cy=first?34:23;mark(M+13,cy,13);
+    ink(WHITE);font("bold",12.5);doc.text("Celine's Cents",M+34,cy-2);
+    ink([200,218,210]);font("normal",9);doc.text(title,M+34,cy+10);doc.text(dateTxt,W-M,cy+4,{align:"right"});
+    if(first){fill(AC);doc.rect(0,hh,W,3,"F");
+      ink([241,190,160]);font("bold",8);doc.text("PREPARED FOR",M,80);
+      ink(WHITE);font("bold",23);doc.text(clean(who)||"Client",M,104);
+      if(sub){ink([200,218,210]);font("normal",10);doc.text(clean(sub),W-M,104,{align:"right"})}
+      y=152}else y=72}
+  head(true);
+  // tick / cross / bang icons
+  function icon(kind,cx,cy,r){r=r||7;var col=kind==="ok"?GOOD:kind==="bad"?BAD:kind==="warn"?WARN:SAND;
+    if(kind==="todo"){stroke(SAND);doc.setLineWidth(1.2);doc.circle(cx,cy,r,"S");return}
+    fill(col);doc.circle(cx,cy,r,"F");stroke(WHITE);doc.setLineWidth(1.5);
+    if(kind==="ok"){doc.line(cx-r*0.45,cy+0.2,cx-r*0.1,cy+r*0.4);doc.line(cx-r*0.1,cy+r*0.4,cx+r*0.5,cy-r*0.4)}
+    else if(kind==="bad"){doc.line(cx-r*0.38,cy-r*0.38,cx+r*0.38,cy+r*0.38);doc.line(cx+r*0.38,cy-r*0.38,cx-r*0.38,cy+r*0.38)}
+    else{doc.line(cx,cy-r*0.5,cx,cy+r*0.12);fill(WHITE);doc.circle(cx,cy+r*0.45,0.9,"F")}}
+  var P={doc:doc,W:W,M:M,CW:CW,
+    get y(){return y},set y(v){y=v},
+    need:function(h){if(y+h>BOT){doc.addPage();head(false)}},
+    gap:function(n){y+=n},
+    h:function(t,note){P.need(70);y+=10;fill(AC);doc.rect(M,y-10,3,13,"F");ink(BR);font("bold",13);doc.text(clean(t),M+10,y);
+      if(note){ink(MU);font("normal",8.5);doc.text(clean(note),W-M,y,{align:"right"})}y+=16},
+    p:function(t,opt){opt=opt||{};var s=opt.size||10,L=lines(t,CW-(opt.indent||0),s);P.need(L.length*s*1.4+4);
+      font(opt.bold?"bold":"normal",s);ink(opt.color||(opt.muted?MU:INK));doc.text(L,M+(opt.indent||0),y);y+=L.length*s*1.4+(opt.after==null?4:opt.after)},
+    bullet:function(t,col){var L=lines(t,CW-16,10);P.need(L.length*14+4);fill(col||AC);doc.circle(M+4,y-3.2,2.2,"F");font("normal",10);ink(INK);doc.text(L,M+14,y);y+=L.length*14+5},
+    // big coloured hero: label, value, sub; optional status pill on the right
+    hero:function(label,value,sub,status){var h=86;P.need(h+12);fill(BR);doc.roundedRect(M,y,CW,h,10,10,"F");
+      ink([200,218,210]);font("bold",8.5);doc.text(clean(label).toUpperCase(),M+20,y+24);
+      ink(GOLD);font("bold",30);doc.text(clean(value),M+20,y+56);
+      if(sub){ink([214,226,220]);font("normal",9);doc.text(lines(sub,status?CW*0.5:CW-40,9).slice(0,1),M+20,y+73)}
+      if(status){var sw=CW*0.42,sx=M+CW-sw-14,sy=y+14,col=status.kind==="good"?GOODS:status.kind==="bad"?BADS:WARNS,tc=status.kind==="good"?GOOD:status.kind==="bad"?BAD:WARN;
+        var BL=lines(status.body,sw-40,9);fill(col);doc.roundedRect(sx,sy,sw,h-28,8,8,"F");
+        icon(status.kind==="good"?"ok":status.kind==="bad"?"bad":"warn",sx+16,sy+17,8);
+        ink(tc);font("bold",12);doc.text(clean(status.head),sx+30,sy+21);ink(INK);font("normal",9);doc.text(BL.slice(0,3),sx+30,sy+35)}
+      y+=h+14},
+    // row of stat tiles: [{l:label,v:value,s:sub,c:colour,bg:bg}]
+    tiles:function(arr,cols){cols=cols||arr.length;var g=8,w=(CW-g*(cols-1))/cols,h=56;
+      for(var i=0;i<arr.length;i+=cols){P.need(h+8);for(var j=0;j<cols&&i+j<arr.length;j++){var t=arr[i+j],x=M+j*(w+g);
+        fill(t.bg||SOFT);doc.roundedRect(x,y,w,h,7,7,"F");if(t.c){fill(t.c);doc.rect(x,y+10,2.5,h-20,"F")}
+        ink(MU);font("bold",7.5);doc.text(lines(t.l,w-20,7.5)[0].toUpperCase(),x+11,y+16);
+        ink(t.vc||INK);font("bold",15);doc.text(lines(t.v,w-18,15)[0],x+11,y+35);
+        if(t.s){ink(MU);font("normal",8);doc.text(lines(t.s,w-18,8)[0],x+11,y+48)}}y+=h+8}y+=4},
+    // coloured callout box
+    box:function(kind,title,body){var bg=kind==="bad"?BADS:kind==="good"?GOODS:kind==="warn"?WARNS:kind==="brand"?[232,240,236]:SOFT,
+        col=kind==="bad"?BAD:kind==="good"?GOOD:kind==="warn"?WARN:BR,paras=[].concat(body||[]),BLs=paras.map(function(t){return lines(t,CW-44,9.8)}),
+        h=(title?22:10)+BLs.reduce(function(a,L){return a+L.length*13.5+5},0)+8;
+      P.need(h+10);fill(bg);doc.roundedRect(M,y,CW,h,8,8,"F");fill(col);doc.rect(M,y+8,3,h-16,"F");
+      var yy=y+18;if(title){icon(kind==="bad"?"bad":kind==="good"?"ok":kind==="warn"?"warn":"ok",M+20,y+15,7.5);ink(col);font("bold",11.5);doc.text(clean(title),M+34,y+19);yy=y+36}
+      ink(INK);BLs.forEach(function(L){font("normal",9.8);doc.text(L,M+34,yy);yy+=L.length*13.5+5});y+=h+10},
+    // horizontal stacked bar with legend: segs=[[label,value,rgb]] ; total optional (else sum)
+    stack:function(segs,opt){opt=opt||{};var tot=opt.total||segs.reduce(function(a,s){return a+Math.max(0,s[1])},0)||1,h=20,x=M;
+      var shown=segs.filter(function(s){return s[1]>0.5}),rows=Math.ceil(shown.length/2);P.need(h+16+rows*26);
+      fill(SOFT);doc.roundedRect(M,y,CW,h,5,5,"F");
+      shown.forEach(function(s){var w=CW*Math.min(1,s[1]/tot);if(x+w>M+CW)w=M+CW-x;if(w<=0)return;fill(s[2]);doc.rect(x,y,w,h,"F");
+        if(w>34){ink(s[3]||WHITE);font("bold",8);doc.text(pct(s[1]/tot),x+w/2,y+13.5,{align:"center"})}x+=w});
+      if(opt.target){var tx=M+CW*Math.min(1,opt.target/tot);stroke(INK);doc.setLineWidth(1.2);doc.line(tx,y-4,tx,y+h+4)}
+      y+=h+16;var cw=CW/2;
+      shown.forEach(function(s,i){var cx=M+(i%2)*cw,cy=y+Math.floor(i/2)*26;fill(s[2]);doc.roundedRect(cx,cy-8,9,9,2,2,"F");
+        ink(INK);font("normal",9.5);doc.text(clean(s[0]),cx+15,cy);ink(MU);font("normal",8.5);doc.text(fmt(s[1])+(opt.unit||"")+" · "+pct(s[1]/(opt.pctOf||tot)),cx+15,cy+11)});
+      y+=rows*26+4},
+    // table; cells may be strings or {bar:0..1,t:"label",c:rgb}
+    table:function(hd,rows,widths,align){var tw=CW,ws=widths.map(function(w){return w*tw});
+      function drawHead(){var HL=hd.map(function(c,i){return lines(String(c).toUpperCase(),ws[i]-10,7.5)}),hh=Math.max.apply(null,HL.map(function(L){return L.length}))*9.5+10;
+        P.need(hh+24);fill(BR);doc.roundedRect(M,y,tw,hh,5,5,"F");ink(WHITE);font("bold",7.5);var x=M;
+        HL.forEach(function(L,i){var a=align&&align[i]==="r";doc.text(L,a?x+ws[i]-6:x+6,y+12,a?{align:"right"}:undefined);x+=ws[i]});y+=hh}
       drawHead();
-      rows.forEach(function(r){var h=rowH(r);if(y+h>H-70){doc.addPage();head();drawHead()}var x=M;
-        var bold=r._bold;doc.setFont("helvetica",bold?"bold":"normal");doc.setFontSize(9.5);doc.setTextColor.apply(doc,INK);
-        r.forEach(function(c,i){var L=doc.splitTextToSize(clean(c),ws[i]-8),a=align&&align[i]==="r";doc.text(L,a?x+ws[i]-4:x+4,y,a?{align:"right"}:undefined);x+=ws[i]});
-        y+=h-6;doc.setDrawColor.apply(doc,LN);doc.setLineWidth(0.6);doc.line(M,y-6,W-M,y-6);y+=4});y+=6},
-    finish:function(){var n=doc.getNumberOfPages();for(var i=1;i<=n;i++){doc.setPage(i);doc.setDrawColor.apply(doc,LN);doc.line(M,H-58,W-M,H-58);
-      doc.setTextColor.apply(doc,INK);doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.text("Celine Sim · Wealth Planner · Alpha Wealth Financial Advisers Pte Ltd · MAS Rep. No. CSY300926263 · Telegram @celineesim",M,H-44);
-      doc.setTextColor.apply(doc,MU);doc.setFont("helvetica","normal");doc.setFontSize(7.5);
-      doc.text(doc.splitTextToSize("For general information only, not financial advice or a recommendation to buy any product. Projections are illustrations using the rates shown and are not guaranteed. Please speak with a licensed representative before making financial decisions.",W-2*M-50),M,H-32);
-      doc.text(i+" / "+n,W-M,H-32,{align:"right"})}return doc.output("arraybuffer")}};
+      rows.forEach(function(r,ri){var LL=r.map(function(c,i){return typeof c==="object"&&c?[clean(c.t||"")]:lines(c,ws[i]-12,9.3)}),
+          h=Math.max.apply(null,LL.map(function(L){return L.length}))*12.5+(r._sub?11:0)+11;
+        if(y+h>BOT){doc.addPage();head(false);drawHead()}
+        if(r._total){fill([232,240,236]);doc.rect(M,y,tw,h,"F")}else if(ri%2){fill([250,247,242]);doc.rect(M,y,tw,h,"F")}
+        var x=M;r.forEach(function(c,i){var a=align&&align[i]==="r",tx=a?x+ws[i]-6:x+6;
+          if(c&&typeof c==="object"){var bw=ws[i]-44,bx=x+6;fill(SOFT);doc.roundedRect(bx,y+h/2-4,bw,7,3,3,"F");
+            if(c.bar>0){fill(c.c||GOOD);doc.roundedRect(bx,y+h/2-4,Math.max(5,bw*Math.min(1,c.bar)),7,3,3,"F")}
+            ink(MU);font("bold",8);doc.text(clean(c.t||""),x+ws[i]-6,y+h/2+2.5,{align:"right"})}
+          else{font(r._total||(i===0&&!r._plain)?"bold":"normal",9.3);ink(r._colors&&r._colors[i]||INK);doc.text(LL[i],tx,y+15,a?{align:"right"}:undefined);
+            if(i===0&&r._sub){ink(MU);font("normal",7.8);doc.text(clean(r._sub),tx,y+15+LL[0].length*12.5)}}
+          x+=ws[i]});
+        y+=h;stroke(LN);doc.setLineWidth(0.5);doc.line(M,y,M+tw,y)});y+=10},
+    // goal timeline: items [{yr, label, amt, col}]
+    timeline:function(items,y0){if(!items.length)return;P.need(108);var x0=M+18,x1=M+CW-18,ys=items.map(function(i){return i.yr}),a=Math.min(y0,Math.min.apply(null,ys)),b=Math.max.apply(null,ys);if(b-a<4)b=a+4;
+      var X=function(v){return x0+(x1-x0)*(v-a)/(b-a)},ly=y+50;
+      stroke(SAND);doc.setLineWidth(3);doc.line(x0,ly,x1,ly);
+      fill(SAND);doc.circle(x0,ly,3,"F");ink(MU);font("bold",7.5);doc.text("TODAY",x0,ly+14,{align:"center"});
+      var used=[];items.slice().sort(function(p,q){return p.yr-q.yr}).forEach(function(it,k){var cx=X(it.yr),up=k%2===0;
+        fill(it.col||AC);doc.circle(cx,ly,6,"F");fill(WHITE);doc.circle(cx,ly,2.4,"F");
+        var tx=Math.max(M+50,Math.min(M+CW-50,cx));stroke(LN);doc.setLineWidth(0.8);doc.line(cx,ly+(up?-7:7),cx,ly+(up?-16:16));
+        ink(INK);font("bold",8.5);var L=lines(it.label,110,8.5).slice(0,1);doc.text(L,tx,up?ly-30:ly+27,{align:"center"});
+        ink(MU);font("normal",8);doc.text(clean(it.yr+" · "+it.amt),tx,up?ly-20:ly+37,{align:"center"})});
+      y+=104},
+    // area chart: pts=[[x,v]], marks=[{x,label,col}]
+    chart:function(pts,marks,opt){opt=opt||{};var h=150,P0=y+8;P.need(h+30);var xs=pts.map(function(p){return p[0]}),vs=pts.map(function(p){return p[1]}),
+        xa=Math.min.apply(null,xs),xb=Math.max.apply(null,xs),vb=Math.max.apply(null,vs.concat([1]))*1.1,L=M+42,R=M+CW-6,T=P0,B=P0+h;
+      var X=function(v){return L+(R-L)*(v-xa)/Math.max(1,xb-xa)},Y=function(v){return B-(B-T)*v/vb};
+      font("normal",7.5);for(var g=0;g<=4;g++){var gv=vb*g/4,gy=Y(gv);stroke(LN);doc.setLineWidth(0.4);doc.line(L,gy,R,gy);ink(MU);doc.text(fmtK(gv),L-6,gy+2.5,{align:"right"})}
+      // area
+      var poly=pts.map(function(p){return [X(p[0]),Y(Math.max(0,p[1]))]}),segs=[];for(var i=1;i<poly.length;i++)segs.push([poly[i][0]-poly[i-1][0],poly[i][1]-poly[i-1][1]]);
+      segs.push([0,B-poly[poly.length-1][1]]);segs.push([poly[0][0]-poly[poly.length-1][0],0]);
+      fill([214,232,224]);doc.lines(segs,poly[0][0],poly[0][1],[1,1],"F",true);
+      stroke(BR);doc.setLineWidth(2);for(i=1;i<poly.length;i++)doc.line(poly[i-1][0],poly[i-1][1],poly[i][0],poly[i][1]);
+      (marks||[]).forEach(function(m,k){if(m.x<xa||m.x>xb)return;var mx=X(m.x);stroke(m.col);doc.setLineWidth(1);doc.setLineDashPattern([3,2],0);doc.line(mx,T,mx,B);doc.setLineDashPattern([],0);
+        ink(m.col);font("bold",7.5);doc.text(clean(m.label),mx+3,T+8+k*11)});
+      ink(MU);font("normal",7.5);var step=Math.max(1,Math.round((xb-xa)/8));for(var a=Math.ceil(xa);a<=xb;a+=step)doc.text(String(a),X(a),B+11,{align:"center"});
+      if(opt.xlabel)doc.text(clean(opt.xlabel),R,B+22,{align:"right"});
+      y=B+28},
+    // cards side by side: [{t,v,d,c}]
+    cards:function(arr){var g=10,w=(CW-g*(arr.length-1))/arr.length,DL=arr.map(function(c){return lines(c.d||"",w-24,8.8)}),
+        h=58+Math.max.apply(null,DL.map(function(L){return L.length}))*11.5;P.need(h+10);
+      arr.forEach(function(c,i){var x=M+i*(w+g);fill(SOFT);doc.roundedRect(x,y,w,h,8,8,"F");fill(c.c||BR);doc.roundedRect(x,y,w,5,3,3,"F");doc.rect(x,y+2,w,3,"F");
+        ink(c.c||BR);font("bold",8);doc.text(clean(c.t).toUpperCase(),x+12,y+22);ink(INK);font("bold",16);doc.text(clean(c.v),x+12,y+42);
+        ink(MU);font("normal",8.8);doc.text(DL[i],x+12,y+58)});y+=h+10},
+    // key/value rows in cards (couple split)
+    people:function(arr){var g=10,w=(CW-g)/2,h=26+arr[0].rows.length*17;P.need(h+10);
+      arr.forEach(function(p,i){var x=M+i*(w+g);fill(SOFT);doc.roundedRect(x,y,w,h,8,8,"F");ink(BR);font("bold",11);doc.text(clean(p.name),x+12,y+18);
+        p.rows.forEach(function(r,k){var ry=y+36+k*17,last=k===p.rows.length-1;if(last){stroke(LN);doc.setLineWidth(0.6);doc.line(x+12,ry-11,x+w-12,ry-11)}
+          ink(last?INK:MU);font(last?"bold":"normal",9.3);doc.text(clean(r[0]),x+12,ry);ink(INK);font("bold",9.3);doc.text(clean(r[1]),x+w-12,ry,{align:"right"})})});y+=h+10},
+    // checklist in two columns: [[label,done]]
+    checks:function(items,cols){cols=cols||2;var w=CW/cols,rows=Math.ceil(items.length/cols);
+      for(var r=0;r<rows;r++){P.need(18);for(var c=0;c<cols;c++){var it=items[r+c*rows];if(!it)continue;var x=M+c*w;
+        icon(it[1]?"ok":(it[2]||"todo"),x+7,y-3,6);ink(it[1]?MU:INK);font(it[1]?"normal":"bold",9.3);doc.text(lines(it[0],w-26,9.3)[0],x+20,y)}y+=17}y+=4},
+    cta:function(title,body){var BL=lines(body,CW-150,9.8),h=Math.max(66,34+BL.length*13);P.need(h+10);fill(AC);doc.roundedRect(M,y,CW,h,10,10,"F");
+      ink(WHITE);font("bold",14);doc.text(clean(title),M+20,y+25);font("normal",9.8);doc.text(BL,M+20,y+42);
+      fill(WHITE);doc.roundedRect(M+CW-122,y+h/2-14,104,28,14,14,"F");ink(AC);font("bold",9.5);doc.text("@celineesim",M+CW-70,y+h/2+3.5,{align:"center"});y+=h+10},
+    finish:function(){var n=doc.getNumberOfPages();for(var i=1;i<=n;i++){doc.setPage(i);stroke(LN);doc.setLineWidth(0.8);doc.line(M,H-60,W-M,H-60);
+      mark(M+7,H-45,7);ink(INK);font("bold",8.5);doc.text("Celine Sim · Wealth Planner · Alpha Wealth Financial Advisers Pte Ltd · MAS Rep. No. CSY300926263 · Telegram @celineesim",M+20,H-42);
+      ink(MU);font("normal",7.3);doc.text(doc.splitTextToSize("For general information only, not financial advice or a recommendation to buy any product. Projections are illustrations using the rates shown and are not guaranteed. Please speak with a licensed representative before making financial decisions.",W-2*M-60),M+20,H-31);
+      doc.text(i+" / "+n,W-M,H-31,{align:"right"})}return doc.output("arraybuffer")}};
   return P}
 function fileName(kind,who){var n=clean(who).replace(/[^A-Za-z0-9 &-]/g,"").trim().replace(/\s+/g,"-")||"Client";return "Celines-Cents-"+kind+"-"+n+"-"+new Date().toISOString().slice(0,10)+".pdf"}
 function browserSave(o){var url=URL.createObjectURL(new Blob([o.data],{type:"application/pdf"})),a=document.createElement("a");
@@ -1488,66 +1601,87 @@ function savePDF(btn,toast,build){
    .catch(function(){$(toast).textContent="Couldn't create the PDF. Check your internet connection, or use Copy my plan instead."})
    .then(function(){btn.textContent=old;btn.disabled=false})}
 
+function statusOf(sel){var e=$(sel);if(!e)return null;var h=e.querySelector("b.h"),ht=h?clean(h.innerText):"",all=clean(e.innerText),body=clean(all.replace(ht,""));
+  return {kind:e.classList.contains("good")?"good":e.classList.contains("bad")?"bad":"warn",head:ht,body:body}}
 function buildGoalsPDF(){
-  var R=compute(),who=couple()?nm1()+" & "+nm2():(I.name.value.trim()||"Client");
-  var P=makePDF(couple()?"Goals Plan for a couple":"Goals Plan",who);
-  P.h("About you");
-  if(couple())P.kv([[nm1()+" · age",age()],[nm2()+" · age",age2()],[nm1()+" · salary / take-home",fmt(num(I.pay))+" / "+fmt(thA())],[nm2()+" · salary / take-home",fmt(num(P2.pay))+" / "+fmt(thB())],["Household living costs",fmt(R.live)+" a month"],["Insurance premiums",fmt(R.ins)+" a month"],["Savings today",fmt(R.sav)],["CPF OA today",fmt(T("oa"))]]);
-  else P.kv([["Age",age()],["Salary before CPF",fmt(num(I.pay))+" a month"],["Take-home pay",fmt(R.pay)+" a month"],["Living costs",fmt(R.live)+" a month"],["Insurance premiums",fmt(R.ins)+" a month"],["Savings today",fmt(R.sav)],["CPF OA today",fmt(num(I.oa))],["Free for goals",fmt(R.avail)+" a month"]]);
-  P.h("Your plan");
-  P.big("Put aside "+fmt(R.need)+" a month to reach every goal");
-  var rows=[["Emergency fund (6 months)",R.efMonthly>0?"1 yr":"Now",fmt(R.ef),"-",fmt(R.efFrom),R.efMonthly>0?fmt(R.efMonthly):"Covered"]];
-  R.rows.forEach(function(r){var c=CAT(r.g.cat),note=r.oaUse>0?" (cash, after "+fmt(r.oaUse)+" CPF OA)":"";
-    rows.push([goalTitle(r.g)+(r.share===0.5?" (your half)":"")+note,(YEAR+r.g.yrs)+" · "+r.g.yrs+" yrs",r.oaUse>0&&r.then<1?"$0 (CPF OA)":fmt(r.then),pct(r.b.r,1).replace(".0%","%"),r.alloc>0?fmt(r.alloc):"-",r.m>0.5?fmt(r.m):"Covered"])});
-  var tot=["Total a month","","","","",fmt(R.need)];tot._bold=true;rows.push(tot);
-  P.table(["Goal","When","Cost then","Grows at","Set aside today","A month"],rows,[0.34,0.13,0.14,0.11,0.14,0.14],["l","l","r","r","r","r"]);
-  P.p("Prices rise "+pct(INFL,1)+" a year for inflation. Long-term goals assume "+pct(S.rate)+" a year growth. Savings fill the emergency fund first, then the soonest goals.",{muted:true,size:9});
+  var R=compute(),who=couple()?nm1()+" & "+nm2():(I.name.value.trim()||"Client"),pay=Math.max(R.pay,1),spare=Math.max(0,R.avail-R.saveA-R.invA);
+  var P=makePDF(couple()?"Goals Plan for two":"Goals Plan",who,couple()?"Planning together":"Age "+age());
+  var last=R.rows.reduce(function(a,r){return Math.max(a,YEAR+r.g.yrs)},YEAR);
+  P.hero("Put aside each month",fmt(R.need),R.rows.length?"to reach every goal, from now until "+last:"to build your emergency fund",statusOf("#status .status"));
+  var NI=noInsurance();
+  if(NI.length)P.box("bad","Red flag: no insurance yet",[insFlagText(NI),"Before investing for goals, let's put protection in place first, starting with a hospital plan, then critical illness, death and disability cover."]);
+  P.h("Your money today");
+  var insTile=R.ins>0?{l:"Insurance",v:fmt(R.ins),s:pct(R.ins/pay)+" of take-home",c:R.ins/pay<=0.15?GOOD:WARN}:{l:"Insurance",v:"None",s:"no cash premiums",c:BAD,vc:BAD,bg:BADS};
+  P.tiles([{l:"Take-home pay",v:fmt(R.pay),s:"a month"+(couple()?", combined":""),c:BR},{l:"Living costs",v:fmt(R.live),s:pct(R.live/pay)+" of take-home",c:GREY},insTile,
+    {l:"Free for goals",v:fmt(Math.max(0,R.avail)),s:"a month",c:R.avail>0?AC:BAD,vc:R.avail>0?AC:BAD}]);
+  P.tiles([{l:"Savings today",v:fmt(R.sav),s:"cash in the bank"},{l:"CPF OA today",v:fmt(T("oa")),s:"can help with housing"},
+    {l:"Emergency fund",v:fmt(R.ef),s:R.efMonthly<=0?"6 months: fully covered":"6 months: "+fmt(R.ef-R.efFrom)+" to go",c:R.efMonthly<=0?GOOD:WARN},
+    {l:"Already putting aside",v:fmt(R.cs+R.ci),s:"saving + investing a month"}]);
+  P.h("Your goals",pct(INFL,1)+" inflation · "+pct(S.rate)+" growth for long-term goals");
+  var tl=R.rows.map(function(r){return {yr:YEAR+r.g.yrs,label:goalTitle(r.g),amt:fmtK(r.then),col:r.b.k==="l"?BR:AC}});
+  if(R.efMonthly>0)tl.unshift({yr:YEAR+1,label:"Emergency fund",amt:fmtK(R.ef),col:GOLD});
+  P.timeline(tl,YEAR);
+  var ef=["Emergency fund",R.efMonthly>0?String(YEAR+1):"Now",fmt(R.ef),"Cash",{bar:R.ef?R.efFrom/R.ef:1,t:pct(R.ef?R.efFrom/R.ef:1),c:GOLD},R.efMonthly>0?fmt(R.efMonthly):"Covered"];ef._sub="6 months of costs";
+  var rows=[ef];
+  R.rows.forEach(function(r){var sub=[r.g.yrs+" yrs away"];if(r.share===0.5)sub.push("your half");if(r.oaUse>0)sub.push("after "+fmtK(r.oaUse)+" CPF OA");
+    var row=[goalTitle(r.g),String(YEAR+r.g.yrs),r.oaUse>0&&r.then<1?"$0":fmt(r.then),pct(r.b.r,1).replace(".0%","%"),{bar:r.fromPct,t:pct(r.fromPct),c:r.b.k==="l"?BR:AC},r.m>0.5?fmt(r.m):"Covered"];
+    row._sub=sub.join(" · ");rows.push(row)});
+  var tot=["Total a month","","","","",fmt(R.need)];tot._total=true;rows.push(tot);
+  P.table(["Goal","Year","Cost then","Grows at","Funded by savings today","A month"],rows,[0.3,0.09,0.13,0.1,0.24,0.14],["l","l","r","r","l","r"]);
+  P.p("Cost then is the price in that year after inflation. Your current savings fill the emergency fund first, then the soonest goals. Goals 10+ years away are invested; nearer ones are saved.",{muted:true,size:8.3});
   P.h("How your take-home pay could work");
-  var spare=Math.max(0,R.avail-R.saveA-R.invA),pay=Math.max(R.pay,1);
-  P.table(["","A month","Share of take-home"],[["Living costs",fmt(R.live),pct(R.live/pay)],["Insurance",fmt(R.ins),pct(R.ins/pay)],["Goals: saving",fmt(R.saveA),pct(R.saveA/pay)],["Goals: investing",fmt(R.invA),pct(R.invA/pay)],["Still free",fmt(spare),pct(spare/pay)]],[0.5,0.25,0.25],["l","r","r"]);
-  P.p(statusText("#status .status"),{bold:true});
-  $$("#status .checks>div").forEach(function(d){P.bullet(d.innerText)});
-  y_todo();function y_todo(){$$("#todo p").forEach(function(p){P.p(p.innerText)})}
-  if(couple()){P.h("How you two could share it ("+(S.share==="income"?"by income":"50/50")+")");
+  P.stack([["Living costs",R.live,GREY],["Insurance",R.ins,SAGE],["Goals: saving",R.saveA,AC],["Goals: investing",R.invA,BR],["Still free",spare,SAND,INK]],{total:pay,unit:" a month"});
+  var insP=R.ins/pay,invP=R.invA/pay,items=[];
+  if(couple()){[[nm1(),num(I.ins),thA()],[nm2(),num(P2.ins),thB()]].forEach(function(x){var r=x[1]/Math.max(x[2],1);
+      items.push(x[1]<=0?[x[0]+": no insurance premiums (red flag)",false,"bad"]:[x[0]+": insurance "+pct(r)+" of take-home "+(r<=0.15?"(within 15% guide)":"(above 15% guide)"),r<=0.15,r<=0.15?null:"warn"])})}
+  else items.push(R.ins<=0?["No insurance premiums (red flag: get covered)",false,"bad"]:["Insurance "+pct(insP)+" of take-home "+(insP<=0.15?"(within 15% guide)":"(above 15% guide)"),insP<=0.15,insP<=0.15?null:"warn"]);
+  items.push(["Investing "+pct(invP)+" of take-home "+(invP>=0.10?"(meets 10% guide)":"(guide: at least 10%)"),invP>=0.10,invP>=0.10?null:"warn"]);
+  items.push([R.efMonthly<=0?"Emergency fund fully covered":"Emergency fund needs "+fmt(R.ef-R.efFrom)+" more",R.efMonthly<=0,R.efMonthly<=0?null:"warn"]);
+  P.checks(items,1);
+  var todo=$$("#todo p").map(function(p){return clean(p.innerText).replace(/^What to do now:\s*/i,"")}).filter(Boolean);
+  if(todo.length)P.box("brand","What to do now",todo);
+  if(couple()){P.h("How you two could share it",S.share==="income"?"split by income":"split 50 / 50");
     var p1=thA(),p2=thB(),t2=Math.max(p1+p2,1),f1=S.share==="income"?p1/t2:0.5,f2=1-f1,goals=R.saveA+R.invA;
-    var row=function(nm,pay,ins,f){return [nm,fmt(pay),fmt(ins),fmt(R.live*f),fmt(goals*f),fmt(pay-ins-R.live*f-goals*f)]};
-    P.table(["","Take-home","Insurance","Living costs","Goals","Left for self"],[row(nm1(),p1,num(I.ins),f1),row(nm2(),p2,num(P2.ins),f2)],[0.2,0.16,0.16,0.16,0.16,0.16],["l","r","r","r","r","r"])}
-  P.h("Next step");P.p("Let's go through this plan together and find the best way to get you there. Message Celine on Telegram @celineesim.");
+    var pr=function(nm,pay,ins,f){return {name:nm,rows:[["Take-home",fmt(pay)],["Insurance",ins>0?fmt(ins):"None"],["Living costs ("+pct(f)+")",fmt(R.live*f)],["Goals ("+pct(f)+")",fmt(goals*f)],["Left for yourself",fmt(pay-ins-R.live*f-goals*f)]]}};
+    P.people([pr(nm1(),p1,num(I.ins),f1),pr(nm2(),p2,num(P2.ins),f2)])}
+  P.cta("Let's make it happen","Let's go through this plan together and find the best way to get you there. A 30-minute chat, no obligation.");
   return {name:fileName("Goals-Plan",who),data:P.finish()}}
 
 function buildRetirePDF(){
   var p=rParams(),R=rsim(p),S=streams(),E=expenses(),A=alloc(),safe=safeSpend(p),cnt=0;STREAMS.forEach(function(x){if(S[x[0]]>0)cnt++});
-  var rwho=RI.name.value.trim()||"Client";var Pd=makePDF("Retirement Game Plan",rwho);
-  Pd.h("Your numbers");
-  Pd.kv([["Age now",p.age],["Stop working at",p.ret],["Monthly spending in retirement",fmt(E.tot)],["Plan until age",p.until],["Savings & investments",fmt(p.sav)],["Still adding",fmt(p.add)+" a month"]]);
-  Pd.h("Your income streams: "+cnt+" of 5");
-  var sr=STREAMS.map(function(x){var v=S[x[0]];return [x[2],v>0?fmt(x[0]==="cpf"?v*(RS.start===70?DEFER70:1):v)+(x[0]==="cpf"?" from age "+RS.start:""):"Not yet"]});
-  Pd.table(["Stream","A month"],sr,[0.6,0.4],["l","r"]);
-  Pd.p(txt("#ans-cover"));
-  Pd.h("Will your money last?");
-  Pd.p(statusText("#r-status .status"),{bold:true});
-  Pd.big("You can safely spend up to "+fmt(safe)+" a month",BR);
-  Pd.p(clean($("#r-permit span:last-child")?$("#r-permit span:last-child").innerText:""));
-  if(txt("#r-next"))Pd.p(txt("#r-next"));
-  Pd.kv([["Savings when you stop work",fmt(R.potAtRet)],["Needed then to last to "+p.until,fmt(R.need)]]);
-  Pd.h("Your paycheck plan: three buckets");
-  var W=Math.max(0,p.spend-p.other-cpfAt(p,p.ret))*12,P0=Math.max(0,R.potAtRet),b1=Math.min(P0,2*W),b2=Math.min(P0-b1,5*W),b3=P0-b1-b2;
-  Pd.table(["Bucket","Amount","What it's for"],[["1 · Cash",fmt(b1),"Next 2 years of withdrawals (FD, T-bills, SSB)"],["2 · Income",fmt(b2),"Years 3 to 7 (bonds, income funds, annuities)"],["3 · Growth",fmt(b3),"Year 8 onwards and your legacy"]],[0.2,0.2,0.6],["l","r","l"]);
-  Pd.h("Ways to change the result");
-  $$("#r-levers .lever").forEach(function(l){Pd.bullet(parts(l))});
-  if(A.t>0){Pd.h("Your investment mix");
-    Pd.table(["","Amount","Share"],Object.keys(ALL).filter(function(k){return A[k]>0}).map(function(k){return [ALL[k][0],fmt(A[k]),pct(A[k]/A.t)]}),[0.5,0.25,0.25],["l","r","r"]);
-    if(th.length)Pd.p("Approach: "+th.map(function(k){return THESIS[k]}).join(", "),{muted:true});
-    $$("#al-notes .lever").forEach(function(l){Pd.bullet(l.innerText)})}
-  Pd.h("Estate: keeping it fair");
-  Pd.p("Property "+fmt(num($("#es-prop")))+", other assets "+fmt(num($("#es-oth")))+", "+Math.max(2,Math.round(num($("#es-n"))||2))+" children.",{muted:true});
-  $$("#es-out .opt").forEach(function(o){Pd.bullet(optText(o))});
-  var i=0,done=[],todo=[];RCL.forEach(function(g){g[1].forEach(function(c){(rdone[i]?done:todo).push(c[0]);i++})});
-  Pd.h("Retirement checklist: "+done.length+" of "+(done.length+todo.length)+" done");
-  if(done.length)Pd.p("Done: "+done.join(", "));
-  if(todo.length)Pd.p("Still to do: "+todo.join(", "),{bold:true});
-  Pd.h("Next step");Pd.p("Let's build your retirement game plan together. Message Celine on Telegram @celineesim.");
-  return {name:fileName("Retirement-Plan",rwho),data:Pd.finish()}}
+  var rwho=RI.name.value.trim()||"Client",P=makePDF("Retirement Game Plan",rwho,"Age "+p.age);
+  P.hero("You can safely spend up to",fmt(safe)+" a month","until age "+p.until+", in today's dollars",statusOf("#r-status .status"));
+  P.h("Your numbers");
+  P.tiles([{l:"Age now",v:String(p.age),c:BR},{l:"Stop working at",v:String(p.ret),c:BR},{l:"Plan until age",v:String(p.until),c:BR},
+    {l:"Spending needed",v:fmt(E.tot),s:"a month, today's $",c:AC},{l:"Savings & investments",v:fmt(p.sav),s:"excl. CPF and home",c:AC},{l:"Still adding",v:fmt(p.add),s:"a month until you stop",c:AC}],3);
+  P.h("Will your money last?","today's dollars");
+  P.chart(R.pts,[{x:p.ret,label:"Stop work "+p.ret,col:AC},{x:p.start,label:"CPF LIFE "+p.start,col:GOOD}].concat(R.last!==null?[{x:R.last,label:"Runs out ~"+Math.floor(R.last),col:BAD}]:[]),{xlabel:"Age"});
+  var bridge=p.ret<p.start?(p.start-p.ret):0;
+  P.tiles([{l:"Savings when you stop",v:fmt(R.potAtRet),s:"at age "+p.ret},{l:"Needed then",v:fmt(R.need),s:"to last until "+p.until,c:R.potAtRet>=R.need?GOOD:BAD,vc:R.potAtRet>=R.need?GOOD:BAD},
+    {l:"Bridge to CPF LIFE",v:bridge?bridge+" yr"+(bridge>1?"s":""):"None",s:bridge?"savings pay more until "+p.start:"no gap to cover"}]);
+  var nxt=txt("#r-next").replace(/^Your next move:\s*/i,"");if(nxt)nxt=nxt.charAt(0).toUpperCase()+nxt.slice(1);if(nxt)P.box("brand","Your next move",[nxt]);
+  P.h("Your income streams: "+cnt+" of 5");
+  var cols={cpf:BR,rent:SAGE,ann:GOLD,div:AC,int:PALE},segs=STREAMS.map(function(x){var v=S[x[0]]*(x[0]==="cpf"&&RS.start===70?DEFER70:1);return [x[2]+(x[0]==="cpf"?" (from "+RS.start+")":""),v,cols[x[0]]]});
+  var passive=segs.reduce(function(a,s){return a+s[1]},0),gap=Math.max(0,E.tot-passive);if(gap>0.5)segs.push(["Still from savings",gap,[236,206,206],BAD]);
+  P.stack(segs,{total:Math.max(E.tot,passive),pctOf:Math.max(E.tot,1),unit:" a month"});
+  P.p("Passive income "+fmt(passive)+" a month against the "+fmt(E.tot)+" you need: "+pct(Math.min(passive/Math.max(E.tot,1),9.99))+" covered."+(cnt<3?" More streams make your income sturdier.":""),{bold:true,size:9.5});
+  P.h("Your paycheck plan: three buckets");
+  var Wd=Math.max(0,p.spend-p.other-cpfAt(p,p.ret))*12,P0=Math.max(0,R.potAtRet),b1=Math.min(P0,2*Wd),b2=Math.min(P0-b1,5*Wd),b3=P0-b1-b2;
+  P.cards([{t:"1 · Cash",v:fmt(b1),d:"The next 2 years of withdrawals. FD, T-bills, SSB.",c:GOLD},{t:"2 · Income",v:fmt(b2),d:"Years 3 to 7. Bonds, income funds, annuities.",c:AC},{t:"3 · Growth",v:fmt(b3),d:"Year 8 onwards and your legacy. Stays invested.",c:BR}]);
+  P.h("Ways to change the result");
+  $$("#r-levers .lever").forEach(function(l){P.bullet(parts(l))});
+  if(A.t>0){P.h("Your investment mix",fmt(A.t)+" in total");
+    P.stack(Object.keys(ALL).filter(function(k){return A[k]>0}).map(function(k){return [ALL[k][0],A[k],hexRGB(ALL[k][1]),k==="cs"||k==="ot"?INK:WHITE]}));
+    if(th.length)P.p("Approach: "+th.map(function(k){return THESIS[k]}).join(", "),{muted:true,size:9});
+    $$("#al-notes .lever").forEach(function(l){P.bullet(l.innerText,BR)})}
+  P.h("Estate: keeping it fair");
+  P.p("Property "+fmt(num($("#es-prop")))+", other assets "+fmt(num($("#es-oth")))+", "+Math.max(2,Math.round(num($("#es-n"))||2))+" children.",{muted:true,size:9});
+  $$("#es-out .opt").forEach(function(o){P.bullet(optText(o))});
+  var i=0,items=[],nd=0;RCL.forEach(function(g){g[1].forEach(function(c){items.push([c[0],!!rdone[i]]);if(rdone[i])nd++;i++})});
+  P.h("Retirement checklist",nd+" of "+items.length+" done");
+  P.checks(items,2);
+  P.cta("Let's build your game plan together","We'll turn your savings into income you can enjoy, and make sure what you've built reaches your family smoothly.");
+  return {name:fileName("Retirement-Plan",rwho),data:P.finish()}}
 $("#pdf-goals").addEventListener("click",function(){savePDF(this,"#toast-goals",buildGoalsPDF)});
 $("#pdf-retire").addEventListener("click",function(){savePDF(this,"#toast-retire",buildRetirePDF)});
 
